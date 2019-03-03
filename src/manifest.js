@@ -8,7 +8,7 @@ module.exports = {
     // version: '1.0.0',
 
     name: '超级拓展',
-    version: '1.0.5',
+    version: '1.0.6',
     // description: '功能强大的浏览器拓展，自由添加网站图标，云端高清壁纸，快速访问书签、天气、笔记、待办事项、扩展管理与历史记录。',
     description: '功能强大的浏览器拓展。',
     author: 'yunser',
