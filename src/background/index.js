@@ -347,6 +347,11 @@ chrome.runtime.onInstalled.addListener(function () {
         id: '033'
     })
 
+    chrome.contextMenus.create({
+        title: '网络工具',
+        id: 'network'
+    })
+
     // chrome.contextMenus.create({
     //     title: '更多',
     //     id: 'more'

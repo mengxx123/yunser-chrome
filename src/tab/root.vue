@@ -548,20 +548,20 @@
             // console.log('tab')
             // this.$storage.set('asd', '456')
             // this.$cookie.set('asd', '456')
-            // this.$http.get(`/users/1`).then(
-            //     response => {
-            //         let data = response.data
-            //         console.log('数据')
-            //         console.log(data)
+            this.$http.get(`/password/users/1/accounts?url=${encodeURIComponent('exmail.qq.com')}`).then(
+                response => {
+                    let data = response.data
+                    console.log('数据')
+                    console.log(data)
                     
-            //     },
-            //     response => {
-            //         console.log('cuol')
-            //         if (response.code === 403) {
-            //             this.$store.state.user = null
-            //         }
-            //         this.loading = false
-            //     })
+                },
+                response => {
+                    console.log('cuol')
+                    if (response.code === 403) {
+                        this.$store.state.user = null
+                    }
+                    this.loading = false
+                })
             // 搜索
             this.trigger = this.$refs.button.$el
             this.searchType = storage.get('searchType', this.searchType)

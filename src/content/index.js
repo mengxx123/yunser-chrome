@@ -821,3 +821,14 @@ for (let item of commonSearchs) {
 		}
 	}
 }
+
+
+// 密码管理模块
+document.getElementById('username').value = 'cjh'
+document.getElementById('password').value = '123456'
+
+function dealPassword($account) {
+	$account
+}
+
+dealPassword(document.getElementById('username'))
