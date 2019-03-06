@@ -1,58 +1,7 @@
 /* eslint-disable */
 // import storage from '../util/storage'
 
-const storage = {
-    set (key, value) {
-        console.log('set', key, value)
-        if (value === undefined || value === null) {
-            localStorage.setItem(key, null)
-            return
-        }
-        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-            localStorage.setItem(key, JSON.stringify({
-                _type: typeof value,
-                value: value
-            }))
-        } else {
-            localStorage.setItem(key, JSON.stringify(value))
-        }
-    },
-    get (key, defaultValue) {
-        // console.log('storage get ' + key)
-        let item = localStorage.getItem(key)
-        if (item === null) {
-            return defaultValue || null
-        }
-        let ret = JSON.parse(item)
-        if (ret && typeof ret === 'object') {
-            if (ret._type === 'string' || ret._type === 'number' || ret._type === 'boolean') {
-                return ret.value
-            }
-        }
-        return ret
-    },
-    setItem (key, value) {
-        this.set(key, value)
-        return this
-    },
-    getItem (key) {
-        return this.get(key)
-    }
-}
-
-// let storage2 = new Proxy(storage, {
-//   get: function (target, key, receiver) {
-//     storage.get(key)
-//     return Reflect.get(target, key, receiver)
-//   },
-//   set: function (target, key, value, receiver) {
-//     storage.set(key, value)
-//     return Reflect.set(target, key, value, receiver)
-//   }
-// })
-
-
-console.log('inject', window.location)
+require('./header')
 
 window.devtoolsDetector = function () {}
 console.clear = function () {}
@@ -211,6 +160,182 @@ body.addEventListener("mousedown",function(e){
 	closeIcons()
 },false);
 
+
+let userNameSelectors = [
+	"input[id*=openid i]",
+	"input[name='username' i]", // 我图网
+	"input[name='account' i]", // 
+	"input[name*=openid i]",
+	"input[class*=openid i]",
+	"input[class='mu-text-field-input' i]", // yunser
+	"input[id*=user i]",
+	"input[name*=user i]",
+	"input[class*=user i]",
+	"input[id*=login i]",
+	"input[name*=login i]",
+	"input[class*=login i]",
+	"input[id*=email i]",
+	"input[name*=email i]",
+	"input[class*=email i]",
+	"input[type=email i]",
+	"input[type='text' i]",
+	"input[type=tel i]"
+]
+
+let passwordSelectors = [
+	"input[type=password i]",
+	'[name="password" i]'
+]
+
+function findInput(selectors) {
+	console.log('find user name')
+	let results = []
+	function push(elem) {
+		for (let item of results) {
+			if (item === elem) {
+				return
+			}
+		}
+		results.push(elem)
+	}
+	for (let item of selectors) {
+		console.log('选择器', item)
+		let elems = document.querySelectorAll(item)
+		if (elems.length) {
+			console.log('ook')
+			// console.log(elem)
+			for (let elem of elems) {
+				if (elem.disabled) {
+					console.log('失效')
+					continue
+				}
+				if (elem.style.display === 'none') {
+					console.log('display none')
+					continue
+				}
+				if (elem.getAttribute('type') === 'submit') {
+					continue
+				}
+				// Elem or its parent has a style 'display: none',
+				// or it is just too narrow to be a real field (a trap for spammers?).
+				if (elem.offsetWidth < 30 || elem.offsetHeight < 10) {
+					console.log('太小')
+					continue
+				}
+				push(elem)
+			}
+		}
+	}
+	console.log('length2', results.length)
+	// console.log(results[0] === results[1])
+	results = results.sort((a, b) => {
+		function score(elem) {
+			let score = 0
+			if (elem.getAttribute('name')) {
+				score += 1
+			}
+			return score
+		}
+		return score(b) - score(a)
+	})
+	console.log('繁华', results)
+	return results
+}
+
+function findUserName() {
+	return findInput(userNameSelectors)
+}
+
+function findPassword() {
+	return findInput(passwordSelectors)
+}
+
+function setInputValue(el, value) {
+	let eventNames = ['click', 'focus']
+    eventNames.forEach(function(eventName) {
+      	el.dispatchEvent(new Event(eventName, { bubbles: true }))
+	})
+	el.setAttribute("value", value);
+    el.value = value;
+    eventNames = [
+		"keypress",
+		"keydown",
+		"keyup",
+		"input",
+		"blur",
+		"change"
+	  ];
+	  eventNames.forEach(function(eventName) {
+		el.dispatchEvent(new Event(eventName, { bubbles: true }));
+	  });
+}
+function setAccountToPage(item) {
+	let accounts = findUserName()
+	if (accounts.length) {
+		console.log('ok account2', accounts[0])
+		// accounts[0].value = item.account
+		setInputValue(accounts[0], item.account)
+	}
+	let passwords = findPassword()
+	if (passwords.length) {
+		console.log('ok password', passwords[0])
+		// passwords[0].value = item.password
+		setInputValue(passwords[0], item.password)
+	}
+	// TODO auto focues
+	// document.querySelector('[name="password"]').value = item.password
+	// document.getElementById('username').value = item.account
+	// document.getElementById('password').value = item.password
+}
+
+let g_list
+function usePassword(index) {
+	console.log(g_list[index])
+}
+window.usePassword = usePassword
+function showPasswordList(list) {
+	g_list = list
+	let divElem = document.createElement('div')
+	// divElem.setAttribute('id', 'tunser-password-list')
+	// divElem.setAttribute('class', 'yunser-style')
+	// divElem.setAttribute('type', 'text/css')
+	let listHtml = ``
+	let i = 0
+	for (let item of list) {
+		listHtml += `
+		<div class="yunser-password-item">${item.title}</div>
+		`
+		i++
+	}
+	divElem.innerHTML = `
+	<div class="yunser-password-list">${listHtml}</div>
+	`
+	// divElem.appendChild(document.createTextNode(styleText))
+	// var head = document.getElementsByTagName("head")[0];
+
+	document.body.appendChild(divElem)
+
+	var oli = document.getElementsByClassName('yunser-password-item')
+	console.log('length', oli)
+    for (let i = 0; i < oli.length; i++) {
+        oli[i].onclick = function () {
+			console.log(i, g_list[i])
+			setAccountToPage(g_list[i])
+        }
+	}
+	window.asd = 'asd'
+}
+// chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
+// 	console.log('youxiaoxi')
+// 	if(request.resource == "content"){
+// 		whichoneSearch = getItem();
+// 		sendResponse({whichone:whichoneSearch});
+// 	}else if(request.resource == "popup"){
+// 		sendResponse({whichone:request.selected});
+// 		localStorage.setItem("index",request.selected);
+// 	}
+// })
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	console.log('onMessage')
     // if(request.editable) {
@@ -221,9 +346,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     //         focused.value = request.info;            
     //     }
 	// }
-	var focused = document.activeElement
-	focused.value = 'asdasd'
-});
+	// var focused = document.activeElement
+	if (request.type === 'passwordList') {
+		console.log('收到list2', request.data)
+		showPasswordList(request.data)
+	}
+})
 
 // background color
 // let bgColor = storage.get('globalBgColor', '')
@@ -290,18 +418,6 @@ function setPageStyle(id, styleText) {
 
 // addStyleElement(styleElement, document);
 
-chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
-	console.log('youxiaoxi')
-	if(request.resource == "content"){
-		whichoneSearch = getItem();
-		sendResponse({whichone:whichoneSearch});
-	}else if(request.resource == "popup"){
-		sendResponse({whichone:request.selected});
-		localStorage.setItem("index",request.selected);
-	}
-});
-
-
 // 监听长连接
 chrome.runtime.onConnect.addListener(function(port) {
 	console.log(port);
@@ -327,14 +443,10 @@ chrome.runtime.onConnect.addListener(function(port) {
 	}
 });
 
-localStorage.setItem('heheda', 'hhhhhaaa')
-console.log(localStorage.getItem('index_ls_default_query'))
-
 chrome.runtime.sendMessage({
 	type: 'getStyle',
 	url: location.host
 }, res => {
-	console.log('收到来自后台的回复：', res)
 	for (let item of res) {
 		setPageStyle(item.id, item.style)
 	}
@@ -824,11 +936,36 @@ for (let item of commonSearchs) {
 
 
 // 密码管理模块
-document.getElementById('username').value = 'cjh'
-document.getElementById('password').value = '123456'
+function dealPassword($account, $password) {
+	if (!$account) {
+		return
+	}
+	$account.value = 'cjh'
+	$password.value = '123456'
+	let $root = document.createElement('div')
+	$root.className = 'yunser-password-box'
+	$root.innerHTML = `
 
-function dealPassword($account) {
-	$account
+	`
+	// styleElem.setAttribute('id', 'ysStyle-' + id)
+	// styleElem.setAttribute('class', 'yunser-style')
+	// styleElem.setAttribute('type', 'text/css')
+	// styleElem.appendChild(document.createTextNode(styleText))
+	let body = document.body;
+	body.appendChild($root)
 }
 
-dealPassword(document.getElementById('username'))
+
+// dealPassword(document.getElementById('username'), document.getElementById('password'))
+
+chrome.runtime.sendMessage({
+	type: 'getPassword',
+	host: location.host
+}, res => {
+	// console.log('收到来自后台的回复：', res)
+	// for (let item of res) {
+	// 	setPageStyle(item.id, item.style)
+	// }
+})
+
+console.log('inject finish2')

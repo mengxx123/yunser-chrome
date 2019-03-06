@@ -46,3 +46,36 @@ https://github.com/Kocal/vue-web-extension
 https://github.com/YuraDev/vue-chrome-extension-template/
 
 http://blog.haoji.me/chrome-plugin-develop.html#injected-script-yu-popup-tong-xin
+
+
+## 自动登录
+
+### 通过
+
+* GitHub
+* 我图网
+* Gitlab
+* 微信开放平台
+* Gia
+* Gia wiki
+* 百度统计
+* 博客园
+* 百度
+* 知乎
+* 微信公众平台
+* miop 后台
+* CSDN
+
+### 未通过
+
+* 云设
+* 腾讯企业邮箱（找不到输入框）
+* iframe
+    * 豆瓣
+    * 站酷
+    * 阿里云邮箱
+    * 阿里云
+
+### 半登录
+
+

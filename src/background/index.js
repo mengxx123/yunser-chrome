@@ -36,15 +36,54 @@ chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
         console.log('查找', ret)
         sendResponse(ret)
     }
-});
+    if (request.type === 'getPassword') {
+        console.log('http')
+        // let host = 'exmail.qq.com'
+        let host = request.host || 'exmail.qq.com'
+        http.get(`/password/users/1/accounts?url=${encodeURIComponent(host)}&key=${storage.get('key')}`).then(
+            response => {
+                let data = response.data
+                console.log('数据')
+                console.log(data)
+                // sendResponse(data)
+                chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+                    chrome.tabs.sendMessage(tabs[0].id, {
+                        type: 'passwordList',
+                        data
+                        // info: chromeStorageObj.cm_items[info.menuItemId].info,
+                        // editable: info.editable,
+                        // doAppend: chromeStorageObj.doAppend
+                    })
+                })
+                
+            },
+            response => {
+                console.log('cuol')
+                if (response.code === 403) {
+                    console.log('403')
+                    // this.$store.state.user = null
+                }
+                this.loading = false
+            })
+        let userStyle = storage.get('userStyle')
+        let ret = []
+        for (let item of userStyle) {
+            if (item.url.includes(request.url)) {
+                ret.push(item)
+            }
+        }
+        console.log('查找', ret)
+        // sendResponse(ret)
+    }
+})
 
 // 监听来自content-script的消息
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
-{
-	console.log('收到来自content-script的消息：');
-	console.log(request, sender, sendResponse);
-	sendResponse('我是后台，我已收到你的消息：' + JSON.stringify(request));
-});
+// chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
+// {
+// 	console.log('收到来自content-script的消息：');
+// 	console.log(request, sender, sendResponse);
+// 	sendResponse('我是后台，我已收到你的消息：' + JSON.stringify(request));
+// });
 
 function getItem(){
 	var item;
@@ -562,3 +601,9 @@ chrome.runtime.onInstalled.addListener(function () {
 //     // }
 //     // this.loading = false
 // })
+
+
+chrome.windows.onRemoved.addListener(windowId => {
+    storage.set('key', '')
+    storage.set('accessToken', '')
+})

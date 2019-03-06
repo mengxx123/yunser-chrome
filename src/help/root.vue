@@ -11,6 +11,10 @@
             <ui-text-field v-model="password" type="password" hintText="密码" />
             <br>
             <ui-raised-button primary @click="login">登录</ui-raised-button>
+            <hr>
+            <ui-text-field v-model="key" type="password" hintText="密钥" />
+            <br>
+            <ui-raised-button primary @click="saveKey">保存密钥</ui-raised-button>
         </ui-article>
     </div>
 </template>
@@ -22,7 +26,8 @@
             return {
                 account: '',
                 password: '',
-                test: ''
+                test: '',
+                key: ''
             }
         },
         computed: {
@@ -31,6 +36,9 @@
         mounted () {
         },
         methods: {
+            saveKey() {
+                this.$storage.set('key', this.key)
+            },
             login() {
                 this.$http.post(`/login`, {
                     account: this.account,

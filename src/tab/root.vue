@@ -144,7 +144,7 @@
 
         <!-- <ui-float-button class="btn-add" icon="add" @click="add" /> -->
         <ui-float-button class="btn-add" icon="add" @click="toggleStore" />
-        <a href="#" class="login" @click.prevent="login" v-if="!isLogin">登录2</a>
+        <a href="#" class="login" @click.prevent="login" v-if="!isLogin">登录</a>
         <ui-menu class="item-menu" :style="{top: menuTop + 'px', left: menuLeft + 'px'}" v-if="menuVisible">
             <ui-menu-item title="打开" @click="openItem"/>
             <ui-menu-item title="编辑" @click="editItem"/>
@@ -548,20 +548,20 @@
             // console.log('tab')
             // this.$storage.set('asd', '456')
             // this.$cookie.set('asd', '456')
-            this.$http.get(`/password/users/1/accounts?url=${encodeURIComponent('exmail.qq.com')}`).then(
-                response => {
-                    let data = response.data
-                    console.log('数据')
-                    console.log(data)
+            // this.$http.get(`/password/users/1/accounts?url=${encodeURIComponent('exmail.qq.com')}`).then(
+            //     response => {
+            //         let data = response.data
+            //         console.log('数据')
+            //         console.log(data)
                     
-                },
-                response => {
-                    console.log('cuol')
-                    if (response.code === 403) {
-                        this.$store.state.user = null
-                    }
-                    this.loading = false
-                })
+            //     },
+            //     response => {
+            //         console.log('cuol')
+            //         if (response.code === 403) {
+            //             this.$store.state.user = null
+            //         }
+            //         this.loading = false
+            //     })
             // 搜索
             this.trigger = this.$refs.button.$el
             this.searchType = storage.get('searchType', this.searchType)

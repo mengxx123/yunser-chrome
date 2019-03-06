@@ -59,9 +59,12 @@ module.exports = {
             'js/vendor.js',
             'js/content.js'
         ],
+        css: [
+            '/inject.css'
+        ],
         run_at: 'document_end',
         matches: ['<all_urls>'],
-        all_frames: true
+        // all_frames: true
     }],
     omnibox: {
         keyword : 'app'
