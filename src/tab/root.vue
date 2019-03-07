@@ -161,6 +161,7 @@
         </div>
         <todo v-if="todoVisible" />
         <saying v-if="sayingVisible" :text="sayingText" />
+        <widget />
     </div>
 </template>
 
@@ -169,11 +170,13 @@
     import storage from '../util/storage.js'
     import todo from './todo.vue'
     import saying from './saying.vue'
+    import widget from './widget.vue'
 
     export default {
         components: {
             todo,
-            saying
+            saying,
+            widget
         },
         data() {
             return {

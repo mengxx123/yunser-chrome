@@ -52,20 +52,28 @@ http://blog.haoji.me/chrome-plugin-develop.html#injected-script-yu-popup-tong-xi
 
 ### 通过
 
-* GitHub
+* GIT
+  * GitHub
+  * Gitlab
+  * 码云
 * 我图网
-* Gitlab
 * 微信开放平台
 * Gia
 * Gia wiki
 * 百度统计
-* 博客园
+* 技术
+  * 博客园
+  * CSDN
 * 百度
 * 知乎
 * 微信公众平台
 * miop 后台
-* CSDN
-
+* 购物
+  * 京东
+  * 淘宝
+* Bilibili
+* 新浪微博
+* 
 ### 未通过
 
 * 云设
@@ -75,7 +83,27 @@ http://blog.haoji.me/chrome-plugin-develop.html#injected-script-yu-popup-tong-xi
     * 站酷
     * 阿里云邮箱
     * 阿里云
+    * QQ
+* 豆瓣、网易云、v2ex
+* 掘金
+*
 
-### 半登录
+https://api.weibo.com/oauth2/authorize?client_id=1283124999&redirect_uri=https%3A%2F%2Fwww.iconfont.cn%2Fapi%2Flogin%2Fweibo%2Fcallback&response_type=code&scope=users_show&state=plus-login#weibo_redirect
+
+## 功能文档
+
+* 支持搜索框，可配置多种搜索引擎。
+* 支持网页二维码。
+    * 生成当前页面二维码，手机扫码快速访问。
+* 支持设置网页背景色。
+* 支持简单的待办事项。
+* 支持图片右键菜单直接下载图片，不用弹出对话框。
+* 内置应用商店，可以快速添加优质应用。
+* 图片右键谷歌以图搜图。
+* 书签管理
+    * 快速查看当前页面的书签。
+    * 快速查看当前页面的历史记录（TODO）。
+    * 快速查看当前页面的网络收藏夹（TODO）。
 
 
+百度翻译

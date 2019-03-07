@@ -3,8 +3,8 @@
 
 require('./header')
 
-window.devtoolsDetector = function () {}
-console.clear = function () {}
+window.devtoolsDetector = function () { }
+console.clear = function () { }
 // var content = chrome.extension.getURL('js/content.js')
 // var script = document.createElement('script')
 // script.setAttribute('type', 'text/javascript')
@@ -12,7 +12,7 @@ console.clear = function () {}
 // document.body.appendChild(script)
 
 
-let body =document.body;
+let body = document.body;
 let state = 0;
 let x = 0;
 let y = 0;
@@ -25,15 +25,15 @@ let g_selectedText = ''
  * @author 刘放 brizer1992@outlook.com 
  * @date 2015/12/17 11:16
  */
-function chooseEngineer(text){
-    console.log('搜索', text)
-	chrome.extension.sendMessage({resource:"content"},function(response){
-		openSearch(response.whichone,text);	
+function chooseEngineer(text) {
+	console.log('搜索', text)
+	chrome.extension.sendMessage({ resource: "content" }, function (response) {
+		openSearch(response.whichone, text);
 	});
 	//这里由于sendMessage是异步的原因，如果直接return会造成未来得及返回正确的值,所以将执行函数提升到onmessage中。
 }
 
-function createDiv(text,left,top){
+function createDiv(text, left, top) {
 	console.log('666-2')
 	var div = document.createElement("div");
 	div.id = "selectionHelper";
@@ -52,47 +52,47 @@ function createDiv(text,left,top){
 	span_search.style.margin = "3px";
 	div.appendChild(span_search);
 	div.appendChild(span_copy);
-	div.style.cssText="left: "+left+"px; "+"top: "+top+"px; "+"position: fixed; font-size: 10px; line-height: 1.5; padding: 3px; border: 1px solid rgb(153, 153, 153); display: block; z-index: 999; background-color: rgb(255, 255, 255);";
+	div.style.cssText = "left: " + left + "px; " + "top: " + top + "px; " + "position: fixed; font-size: 10px; line-height: 1.5; padding: 3px; border: 1px solid rgb(153, 153, 153); display: block; z-index: 999; background-color: rgb(255, 255, 255);";
 	body.appendChild(div);
 	div.addEventListener('mousedown', e => {
 		console.log('elem mousedown')
 		e.stopPropagation()
 	}, true)
-	a_search.onclick = function(){
+	a_search.onclick = function () {
 		console.log('搜索点击')
-		chooseEngineer(text);		
+		chooseEngineer(text);
 		closeIcons()
 	};
-	a_copy.onclick = function(e) {
+	a_copy.onclick = function (e) {
 		copyToBorad(text);
 		closeIcons()
 	};
 }
 
-function copyToBorad(text){
-    // document.execCommand("copy", false, null);
+function copyToBorad(text) {
+	// document.execCommand("copy", false, null);
 	// window.prompt("请点击ctrl+C来复制", text);
-    
-    var textarea = document.createElement('textarea');
-    document.body.appendChild(textarea);
-    textarea.value = g_selectedText;
-    textarea.select();
-    document.execCommand('copy');
-    textarea.remove();
-    console.log('复制成功', g_selectedText)
+
+	var textarea = document.createElement('textarea');
+	document.body.appendChild(textarea);
+	textarea.value = g_selectedText;
+	textarea.select();
+	document.execCommand('copy');
+	textarea.remove();
+	console.log('复制成功', g_selectedText)
 }
 
-function openSearch(search_engineer,text){
-    console.log('clik', openSearch)
-	switch (search_engineer){
+function openSearch(search_engineer, text) {
+	console.log('clik', openSearch)
+	switch (search_engineer) {
 		case '0':
-			window.open("http://www.baidu.com/baidu?word="+text,"_blank");	
+			window.open("http://www.baidu.com/baidu?word=" + text, "_blank");
 			break;
 		case '1':
-			window.open("http://cn.bing.com/search?q="+text,"_blank");
+			window.open("http://cn.bing.com/search?q=" + text, "_blank");
 			break;
 		case '2':
-			window.open("https://www.google.com.hk/?q=hello#safe=strict&q="+text,"_blank");
+			window.open("https://www.google.com.hk/?q=hello#safe=strict&q=" + text, "_blank");
 			break;
 	};
 }
@@ -106,23 +106,23 @@ function openSearch(search_engineer,text){
  * @author 刘放 brizer1992@outlook.com
  * @date 2015/12/15 
  */
-body.addEventListener("mouseup",function(e){
+body.addEventListener("mouseup", function (e) {
 	console.log('up4')
 	var selected = window.getSelection();
 	var selected_value = selected.toString();
-	if(selected_value!=='' && selected_value.length<=30){
+	if (selected_value !== '' && selected_value.length <= 30) {
 		var eve = e || window.event;
 		x = eve.clientX;
 		y = eve.clientY;
 		x += document.body.scrollLeft;
 		y += document.body.scrollTop;
-        g_selectedText = selected_value
-		createDiv(selected_value,x,y);
+		g_selectedText = selected_value
+		createDiv(selected_value, x, y);
 		state = 1;
-	}else{
+	} else {
 		//
 	}
-},false);
+}, false);
 
 function closeIcons() {
 	var div = document.getElementById("selectionHelper");
@@ -141,16 +141,16 @@ function closeIcons() {
  * @author 刘放 brizer1992@outlook.com
  * @date 2015/12/15
  */
-body.addEventListener("mousedown",function(e){
+body.addEventListener("mousedown", function (e) {
 	console.log('mousedown')
-	if(state == 1){
+	if (state == 1) {
 		var xx = e.clientX;
 		var yy = e.clientY;
 		xx += document.body.scrollLeft;
 		yy += document.body.scrollTop;
-		if(xx<=x+38&&yy<=y+26){
+		if (xx <= x + 38 && yy <= y + 26) {
 
-		}else{
+		} else {
 			var div = document.getElementById("selectionHelper");
 			div.style.display = "none";
 			state = 0;
@@ -158,7 +158,7 @@ body.addEventListener("mousedown",function(e){
 		}
 	}
 	closeIcons()
-},false);
+}, false);
 
 
 let userNameSelectors = [
@@ -252,22 +252,22 @@ function findPassword() {
 
 function setInputValue(el, value) {
 	let eventNames = ['click', 'focus']
-    eventNames.forEach(function(eventName) {
-      	el.dispatchEvent(new Event(eventName, { bubbles: true }))
+	eventNames.forEach(function (eventName) {
+		el.dispatchEvent(new Event(eventName, { bubbles: true }))
 	})
 	el.setAttribute("value", value);
-    el.value = value;
-    eventNames = [
+	el.value = value;
+	eventNames = [
 		"keypress",
 		"keydown",
 		"keyup",
 		"input",
 		"blur",
 		"change"
-	  ];
-	  eventNames.forEach(function(eventName) {
+	];
+	eventNames.forEach(function (eventName) {
 		el.dispatchEvent(new Event(eventName, { bubbles: true }));
-	  });
+	});
 }
 function setAccountToPage(item) {
 	let accounts = findUserName()
@@ -307,8 +307,11 @@ function showPasswordList(list) {
 		`
 		i++
 	}
+	if (list.length === 0) {
+		listHtml = '没有记录'
+	}
 	divElem.innerHTML = `
-	<div class="yunser-password-list">${listHtml}</div>
+	<div id="yunser-password-list" class="yunser-password-list" style="display: none;">${listHtml}</div>
 	`
 	// divElem.appendChild(document.createTextNode(styleText))
 	// var head = document.getElementsByTagName("head")[0];
@@ -317,13 +320,13 @@ function showPasswordList(list) {
 
 	var oli = document.getElementsByClassName('yunser-password-item')
 	console.log('length', oli)
-    for (let i = 0; i < oli.length; i++) {
-        oli[i].onclick = function () {
+	for (let i = 0; i < oli.length; i++) {
+		oli[i].onclick = function () {
 			console.log(i, g_list[i])
-			setAccountToPage(g_list[i])
-        }
+            setAccountToPage(g_list[i])
+            document.querySelector('#yunser-password-list').style.display = 'none'
+		}
 	}
-	window.asd = 'asd'
 }
 // chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
 // 	console.log('youxiaoxi')
@@ -336,20 +339,26 @@ function showPasswordList(list) {
 // 	}
 // })
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	console.log('onMessage')
-    // if(request.editable) {
-    //     var focused = document.activeElement;
-    //     if(request.doAppend) {
-    //         focused.value+=request.info;
-    //     } else {
-    //         focused.value = request.info;            
-    //     }
+	// if(request.editable) {
+	//     var focused = document.activeElement;
+	//     if(request.doAppend) {
+	//         focused.value+=request.info;
+	//     } else {
+	//         focused.value = request.info;            
+	//     }
 	// }
 	// var focused = document.activeElement
 	if (request.type === 'passwordList') {
 		console.log('收到list2', request.data)
 		showPasswordList(request.data)
+    }
+    if (request.type === 'type_fill_text') {
+		console.log('收到type_fill_text', request.data)
+        // showPasswordList(request.data)
+        document.activeElement.value = request.data
+        // document.activeElement.style.display = 'none'
 	}
 })
 
@@ -419,10 +428,10 @@ function setPageStyle(id, styleText) {
 // addStyleElement(styleElement, document);
 
 // 监听长连接
-chrome.runtime.onConnect.addListener(function(port) {
+chrome.runtime.onConnect.addListener(function (port) {
 	console.log(port);
 	if (port.name == 'test-connect') {
-		port.onMessage.addListener(function(msg) {
+		port.onMessage.addListener(function (msg) {
 			console.log('收到长连接消息：', msg);
 			if (msg.type == 'setStyle') {
 				console.log('设置样式', msg.style)
@@ -704,12 +713,12 @@ function parseQueryString(url) {
 	var params = {};
 	var arr = url.split("?");
 	if (arr.length <= 1) {
-	   return params;
+		return params;
 	}
 	arr = arr[1].split("&");
-	for(var i = 0, l = arr.length; i < l; i++) {
-	   var a = arr[i].split("=");
-	   params[a[0]] = a[1];
+	for (var i = 0, l = arr.length; i < l; i++) {
+		var a = arr[i].split("=");
+		params[a[0]] = a[1];
 	}
 	return params;
 }
@@ -869,7 +878,7 @@ let commonSearchs = [
 
 if (location.host === 'www.sogou.com') {
 
-	
+
 }
 
 function searchAsd(item) {
@@ -936,27 +945,29 @@ for (let item of commonSearchs) {
 
 
 // 密码管理模块
-function dealPassword($account, $password) {
-	if (!$account) {
-		return
-	}
-	$account.value = 'cjh'
-	$password.value = '123456'
+function dealPassword() {
 	let $root = document.createElement('div')
 	$root.className = 'yunser-password-box'
-	$root.innerHTML = `
+	$root.innerHTML = `P
 
 	`
-	// styleElem.setAttribute('id', 'ysStyle-' + id)
-	// styleElem.setAttribute('class', 'yunser-style')
-	// styleElem.setAttribute('type', 'text/css')
-	// styleElem.appendChild(document.createTextNode(styleText))
-	let body = document.body;
+	let body = document.body
 	body.appendChild($root)
+
+	$root.addEventListener('click', () => {
+		let $list = document.querySelector('#yunser-password-list')
+
+		// $list.style.display = 'none'
+		if ($list.style.display === 'block') {
+			$list.style.display = 'none'
+		} else {
+			$list.style.display = 'block'
+		}
+	})
 }
 
 
-// dealPassword(document.getElementById('username'), document.getElementById('password'))
+dealPassword()
 
 chrome.runtime.sendMessage({
 	type: 'getPassword',

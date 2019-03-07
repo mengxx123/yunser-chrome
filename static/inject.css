@@ -6,17 +6,23 @@ body {
 /* 密码管理 */
 .yunser-password-box {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 30px;
-    height: 30px;
-    background-color: #f00;
+    bottom: 8px;
+    left: 8px;
+    z-index: 10000000;
+    width: 24px;
+    height: 24px;
+    text-align: center;
+    line-height: 24px;
+    background-color: #fff;
+    border-radius: 50%;
+    border: 1px solid #000;
+    cursor: pointer;
 }
 .yunser-password-list {
     position: fixed;
-    top: 80px;
-    right: 16px;
-    z-index: 100000;
+    bottom: 80px;
+    left: 16px;
+    z-index: 10000000;
     width: 240px;
     /* height: 300px; */
     background-color: #fff;

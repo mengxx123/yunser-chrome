@@ -14,9 +14,8 @@ console.log('background !')
 
 //选中的搜索引擎
 var whichoneSearch = '0';
-/**
- * @description 监听来自content.js的消息
- */
+
+// chrome.runtime.onMessage
 chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
 	if(request.resource == "content"){
 		whichoneSearch = getItem();
@@ -77,14 +76,6 @@ chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
     }
 })
 
-// 监听来自content-script的消息
-// chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
-// {
-// 	console.log('收到来自content-script的消息：');
-// 	console.log(request, sender, sendResponse);
-// 	sendResponse('我是后台，我已收到你的消息：' + JSON.stringify(request));
-// });
-
 function getItem(){
 	var item;
 	if(!window.localStorage){
@@ -98,29 +89,31 @@ function getItem(){
 	return item;
 }
 
+function initOmnibox() {
+    chrome.omnibox.onInputChanged.addListener(
+        function (text, suggest) {
+            console.log('inputChanged: ' + text);
+            suggest([
+                { content: text + " one", description: "the first one" },
+                { content: text + " number two", description: "the second entry" }
+            ]);
+        })
 
-chrome.omnibox.onInputChanged.addListener(
-  function(text, suggest) {
-    console.log('inputChanged: ' + text);
-    suggest([
-      {content: text + " one", description: "the first one"},
-      {content: text + " number two", description: "the second entry"}
-    ]);
-  });
-
-// This event is fired with the user accepts the input in the omnibox.
-chrome.omnibox.onInputEntered.addListener(text => {
-    // if (!text) {
-    //     return
-    // }
-    let url = 'https://search.yunser.com/search?keyword=' + text
-    console.log('url', url)
-    chrome.tabs.getSelected(null, tab => {
-        chrome.tabs.update(tab.id, {
-            url
+    chrome.omnibox.onInputEntered.addListener(text => {
+        if (!text) {
+            return
+        }
+        let url = 'https://search.yunser.com/search?keyword=' + encodeURIComponent(text)
+        console.log('url', url)
+        chrome.tabs.getSelected(null, tab => {
+            chrome.tabs.update(tab.id, {
+                url
+            })
         })
     })
-})
+}
+
+initOmnibox()
 
 // function getOpeningIds() {
 //     var ids = [];
@@ -534,7 +527,8 @@ chrome.runtime.onInstalled.addListener(function () {
             console.log('FILL_TEXT')
             chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
                 chrome.tabs.sendMessage(tabs[0].id, {
-                    asd: 'asd',
+                    type: 'type_fill_text',
+                    data: 'asd',
                     // info: chromeStorageObj.cm_items[info.menuItemId].info,
                     // editable: info.editable,
                     // doAppend: chromeStorageObj.doAppend
@@ -581,27 +575,7 @@ chrome.runtime.onInstalled.addListener(function () {
     //         console.log("Got expected error: " + chrome.extension.lastError.message);
     //     }
     // });
-});
-
-// http.post(`/login`, {
-//     account: '',
-//     password: ''
-// })
-// .then(res => {
-//     let data = res.data
-//     console.log('数据')
-//     console.log(data)
-//     storage.set('user', data.user)
-//     storage.set('accessToken', data.accessToken)
-// },
-// res => {
-//     console.log('cuol', res)
-//     // if (response.code === 403) {
-//     //     this.$store.state.user = null
-//     // }
-//     // this.loading = false
-// })
-
+})
 
 chrome.windows.onRemoved.addListener(windowId => {
     storage.set('key', '')
