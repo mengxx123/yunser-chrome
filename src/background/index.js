@@ -5,7 +5,44 @@ import http from '../util/http'
 const __ = chrome.i18n.getMessage
 console.log(__('background'))
 
+var getHost = function(url) { 
+    var host = "null";
+    if(typeof url == "undefined"
+                    || null == url)
+            url = window.location.href;
+    var regex = /.*\:\/\/([^\/]*).*/;
+    var match = url.match(regex);
+    if(typeof match != "undefined"
+                    && null != match)
+            host = match[1];
+    return host;
+}
 
+let $root = document.createElement('textarea')
+$root.id = 'clipboard'
+document.body.appendChild($root)
+
+function copyToClipboard(str) {
+    let text = str
+    var copyFrom = document.createElement("textarea");
+    copyFrom.textContent = text;
+    copyFrom.value = text;
+    var body = document.getElementsByTagName('body')[0];
+    body.appendChild(copyFrom);
+    copyFrom.select();
+    let ret = document.execCommand('copy');
+    // body.removeChild(copyFrom);
+    console.log('copy ok', ret)
+
+    // var obj=document.getElementById("clipboard");
+    // console.log('elem', obj)
+    // if( obj ) {
+    //     obj.value = str;
+    //     obj.select();
+    //     let ret = document.execCommand("copy", false, null);
+    //     console.log('copyed', ret, obj.value)
+    // }
+}
 
 // import storage from '../util/storage'
 
@@ -35,9 +72,21 @@ chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
         console.log('查找', ret)
         sendResponse(ret)
     }
+    if (request.type === 'getHeaders') {
+        sendResponse(requuestMap[request.url])
+    }
+
+    if (request.type === 'type_copy') {
+        console.log('后台复制')
+        copyToClipboard(request.data)
+    }
+
     if (request.type === 'getPassword') {
         console.log('http')
         // let host = 'exmail.qq.com'
+        if (!storage.get('accessToken')) {
+            return
+        }
         let host = request.host || 'exmail.qq.com'
         http.get(`/password/users/1/accounts?url=${encodeURIComponent(host)}&key=${storage.get('key')}`).then(
             response => {
@@ -394,31 +443,6 @@ chrome.runtime.onInstalled.addListener(function () {
     //     id: '028'
     // })
 
-    var getHost = function(url) { 
-        var host = "null";
-        if(typeof url == "undefined"
-                        || null == url)
-                url = window.location.href;
-        var regex = /.*\:\/\/([^\/]*).*/;
-        var match = url.match(regex);
-        if(typeof match != "undefined"
-                        && null != match)
-                host = match[1];
-        return host;
-    }
-
-
-    function copyToClipboard(str) {
-        var obj=document.getElementById("clipboard");
-        console.log('elem', obj)
-        if( obj ) {
-            obj.value = str;
-            obj.select();
-            document.execCommand("copy", false, null);
-            console.log('copyed', obj.value)
-        }
-    }
-
     chrome.contextMenus.onClicked.addListener((menu, e) => {
         console.log('menu', menu)
         if (menu.menuItemId === '001') {
@@ -581,3 +605,40 @@ chrome.windows.onRemoved.addListener(windowId => {
     storage.set('key', '')
     storage.set('accessToken', '')
 })
+
+console.log('asd2345', chrome.webRequest)
+
+// chrome.webRequest.onHeadersReceived.addListener(function (res, asd){
+//     console.log('webRequest请求', res, asd)
+// })
+
+// chrome.webRequest.onHeadersReceived.addListener(function(details) {
+//     details.responseHeaders.push({name:'Access-Control-Allow-Origin',value:"*"});
+//     console.log(details.responseHeaders)
+//       return {responseHeaders:details.responseHeaders};
+//       }
+// )
+
+let requuestMap = {
+
+}
+
+chrome.webRequest.onHeadersReceived.addListener(details => {
+    console.log(details)
+    requuestMap[details.url] = details
+}, {
+    urls: ["<all_urls>"],
+    "types": [
+        "main_frame", 
+        "sub_frame", 
+        "stylesheet", 
+        "script", 
+        "image", 
+        "object", 
+        "xmlhttprequest", 
+        "other"
+    ]
+},
+["responseHeaders"])
+
+console.log('background end!')

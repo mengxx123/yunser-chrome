@@ -83,6 +83,9 @@
                     <ui-list-item disableRipple @click="clearStorage" title="清除数据">
                         <!-- <ui-switch v-model="todoVisible" slot="right" /> -->
                     </ui-list-item>
+                    <ui-list-item disableRipple title="v1.0.5">
+                        <!-- <ui-switch v-model="todoVisible" slot="right" /> -->
+                    </ui-list-item>
                 </ui-list>
             </div>
         </ui-drawer>

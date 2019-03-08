@@ -45,3 +45,48 @@ body {
 .yunser-password-item:hover {
     background-color: #f9f9f9;
 }
+
+/* 图片浏览 */
+.yext-image-info {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 10000000;
+    padding: 0 16px;
+    background-color: #fff;
+}
+
+.yext-action-button {
+    /* position: fixed;
+    top: 0px;
+    right: 0px; */
+    /* z-index: 10000000; */
+    padding: 0 16px;
+    margin-left: 16px;
+    color: #fff;
+    background-color: #000;
+    cursor: pointer;
+}
+
+.yext-appbar {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 64px;
+    display: flex;
+    padding: 0 16px;
+    justify-content: space-between;
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, .12);
+    user-select: none;
+}
+.yext-appbar-title {
+    /* padding-left: 16px; */
+    line-height: 64px;
+    font-size: 16px;
+}
+.yext-appbar-actions {
+    display: flex;
+    align-items: center;
+}
