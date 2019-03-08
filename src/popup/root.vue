@@ -108,10 +108,10 @@
                 </div>
                 <div class="layout-right">
                     <div class="section">
-                        <h2 class="section-title">搜索</h2>
-                        <div class="empty" v-if="!bookmarks.length">该网站没有书签</div>
+                        <h2 class="section-title">浏览历史</h2>
+                        <div class="empty" v-if="!histories.length">该网站没有浏览历史</div>
                         <ul class="bookmark-list">
-                            <li class="item" v-for="item, index in bookmarks" :key="index" @click="openBookmark(item)">
+                            <li class="item" v-for="item, index in histories" :key="index" @click="openBookmark(item)">
                                 <div class="name">{{ item.title }}</div>
                                 <!-- <ui-switch label="启用" v-model="item.enable" class="demo-switch" @input="val => useStyle(val, item)" /> -->
                             </li>
@@ -141,15 +141,16 @@
                 qrcodeSrc: '',
                 styles: [],
                 bookmarks: [
-                    {
-                        dateAdded: 1547390521103,
-                        id: "1207",
-                        index: 23,
-                        parentId: "1084",
-                        title: "Javascript 修改url不刷新页面_百度搜索",
-                        url: "https"
-                    }
-                ]
+                    // {
+                    //     dateAdded: 1547390521103,
+                    //     id: "1207",
+                    //     index: 23,
+                    //     parentId: "1084",
+                    //     title: "Javascript 修改url不刷新页面_百度搜索",
+                    //     url: "https"
+                    // }
+                ],
+                histories: []
             }
         },
         computed: {
@@ -188,6 +189,10 @@
                 chrome.bookmarks.search(host, list => {
                     console.log('搜索结果', list)
                     this.bookmarks = list
+                })
+                chrome.history.search(host, list => {
+                    console.log('history', list)
+                    this.histories = list
                 })
             })
 
