@@ -22,6 +22,8 @@ module.exports = {
      */
     permissions: [
         '<all_urls>',
+        "webRequest",
+        "webRequestBlocking",
         '*://*/*',
         'activeTab',
         'tabs',
@@ -38,15 +40,14 @@ module.exports = {
         "clipboardRead",
         "clipboardWrite",
         "bookmarks",
-        // "webRequest",
-        // 'clipboardWrite',
+        
     ],
     browser_action: {
         default_title: 'title',
         default_popup: 'pages/popup.html'
     },
     background: {
-        persistent: false,
+        persistent: true,
         page: 'pages/background.html'
     },
     chrome_url_overrides: {
@@ -65,6 +66,7 @@ module.exports = {
         run_at: 'document_end',
         matches: ['<all_urls>'],
         // all_frames: true
+        // types: ["main_frame", "sub_frame"] },
     }],
     omnibox: {
         keyword : 'app'

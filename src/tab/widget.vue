@@ -1,5 +1,5 @@
 <template>
-    <div class="widget">
+    <div class="widget" v-if="flase">
         <ul>
             
         </ul>

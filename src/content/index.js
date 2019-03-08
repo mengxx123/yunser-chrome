@@ -967,16 +967,38 @@ function dealPassword() {
 }
 
 
-dealPassword()
 
-chrome.runtime.sendMessage({
-	type: 'getPassword',
-	host: location.host
-}, res => {
-	// console.log('收到来自后台的回复：', res)
-	// for (let item of res) {
-	// 	setPageStyle(item.id, item.style)
-	// }
-})
+
+
+
 
 console.log('inject finish2')
+
+function initInHtml() {
+    console.log('初始化 HTML')
+    chrome.runtime.sendMessage({
+		type: 'getPassword',
+		host: location.host
+	}, res => {
+		// console.log('收到来自后台的回复：', res)
+		// for (let item of res) {
+		// 	setPageStyle(item.id, item.style)
+		// }
+    })
+    
+    dealPassword()
+}
+
+function init() {
+
+    // if (window)
+    console.log('哈哈哈', )
+
+    if (window._app.contentType.includes('text/html')) {
+        initInHtml()
+    }
+}
+
+window._init = init
+
+require('./image')
