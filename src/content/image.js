@@ -62,44 +62,6 @@ function initImage() {
 
 }
 
-if (location.href.match(/.(gif|png|jpg|webp)$/)) {
-    // console.log('is image')
-    let img = document.querySelector('img')
-    // console.log(img.width, img.height)
-    // let $root = document.createElement('div')
-    
-    // $root.className = 'yext-image-info'
-    // $root.innerHTML = 
-    // let body = document.body
-    // body.appendChild($root)
-    // window.g_degree = 0
-    let actions = [
-        {
-            id: 'img-2',
-            text: '旋转',
-            click() {
-                window.g_degree = (window.g_degree || 0) + 90
-                let $img = document.querySelector('img')
-                $img.style.transform = `rotate(${window.g_degree}deg)`
-                // $content.innerHTML = JSON.stringify(JSON.parse($content.innerHTML), null, 4)
-            }
-        },
-        // {
-        //     id: 'img-3',
-        //     text: '编辑',
-        //     click() {
-        //         let $content = document.querySelector('pre')
-        //         $content.setAttribute('contentEditable', 'true')
-        //         // $content.innerHTML = JSON.stringify(JSON.parse($content.innerHTML), null, 4)
-        //     }
-        // }
-    ]
-    createAppbar({
-        title: `图片（ ${img.width} × ${img.height}）`,
-        actions
-    })
-}
-
 chrome.runtime.sendMessage({
 	type: 'getHeaders',
 	url: location.href
@@ -107,24 +69,63 @@ chrome.runtime.sendMessage({
     console.log('收到来自后台的回复：', res)
     let contentType = ''
 	for (let item of res.responseHeaders) {
-        if (item.name === 'Content-Type') {
+        if (item.name.toLowerCase() === 'content-type') {
             contentType = item.value
         }
     }
     console.log('contentType', contentType)
     window._app.contentType = contentType
 
-    
-    if (contentType.includes('text/plain')) {
-        let $root = document.createElement('div')
+    if (contentType.includes('image/svg+xml')) {
+        console.log('is svg')
+    } else if (contentType.includes('image/')) {
+        // console.log('is image')
+        let img = document.querySelector('img')
+        // console.log(img.width, img.height)
+        // let $root = document.createElement('div')
         
-        $root.className = 'yext-action-button'
-        $root.innerHTML = actions.map(item => {
-            return `<div>${item.text}</div>`
-        }).join('\n')
-        let body = document.body
-        body.appendChild($root)
+        // $root.className = 'yext-image-info'
+        // $root.innerHTML = 
+        // let body = document.body
+        // body.appendChild($root)
+        // window.g_degree = 0
+        let actions = [
+            {
+                id: 'img-2',
+                text: '旋转',
+                click() {
+                    window.g_degree = (window.g_degree || 0) + 90
+                    let $img = document.querySelector('img')
+                    $img.style.transform = `rotate(${window.g_degree}deg)`
+                    // $content.innerHTML = JSON.stringify(JSON.parse($content.innerHTML), null, 4)
+                }
+            },
+            // {
+            //     id: 'img-3',
+            //     text: '编辑',
+            //     click() {
+            //         let $content = document.querySelector('pre')
+            //         $content.setAttribute('contentEditable', 'true')
+            //         // $content.innerHTML = JSON.stringify(JSON.parse($content.innerHTML), null, 4)
+            //     }
+            // }
+        ]
+        createAppbar({
+            title: `图片（ ${img.width} × ${img.height}）`,
+            actions
+        })
     }
+    
+    // if (contentType.includes('text/plain')) {
+    //     let $root = document.createElement('div')
+        
+    //     $root.className = 'yext-action-button'
+    //     $root.innerHTML = actions.map(item => {
+    //         return `<div>${item.text}</div>`
+    //     }).join('\n')
+    //     let body = document.body
+    //     body.appendChild($root)
+    // }
 
     if (contentType.includes('application/json')) {
         let actions = [
