@@ -303,7 +303,9 @@ function showPasswordList(list) {
 	let i = 0
 	for (let item of list) {
 		listHtml += `
-		<div class="yunser-password-item">${item.title}</div>
+		<div class="yunser-password-item">
+			<div class="yunser-password-title">${item.title}</div>
+		</div>
 		`
 		i++
 	}
@@ -311,7 +313,10 @@ function showPasswordList(list) {
 		listHtml = '没有记录'
 	}
 	divElem.innerHTML = `
-	<div id="yunser-password-list" class="yunser-password-list" style="display: none;">${listHtml}</div>
+	<div id="yunser-password-list" class="yunser-password-list" style="display: none;">
+		${listHtml}
+		<a class="yunser-password-manage" href="https://password.yunser.com/manage?host=${encodeURIComponent(location.host)}" target="_blank">管理密码</a>
+	</div>
 	`
 	// divElem.appendChild(document.createTextNode(styleText))
 	// var head = document.getElementsByTagName("head")[0];
