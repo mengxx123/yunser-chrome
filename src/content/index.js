@@ -1115,6 +1115,22 @@ function dealPassword() {
 
 console.log('inject finish2')
 
+function dealSite() {
+	let $root = document.createElement('div')
+	$root.innerHTML = `
+	<div id="yunser-site-box" class="yunser-site-box" title="查看站点">
+		i
+	</div>
+
+	`
+	let body = document.body
+	body.appendChild($root)
+
+	document.querySelector('#yunser-site-box').addEventListener('click', () => {
+		window.open(`https://nav.yunser.com/sites/${location.host}`, '_blank')
+	})
+}
+
 function initInHtml() {
     console.log('初始化 HTML')
     chrome.runtime.sendMessage({
@@ -1127,7 +1143,8 @@ function initInHtml() {
 		// }
     })
     
-    dealPassword()
+	dealPassword()
+	dealSite()
 }
 
 function init() {

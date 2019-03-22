@@ -5,6 +5,7 @@
         <ui-article class="article">
             <h2>标签页</h2>
             <p>鼠标右键可以编辑和删除快捷方式。</p>
+            <ui-checkbox v-model="trustDevice" label="信任此设备（注意：你的账号、密码、和私钥将会明文保存在这个设备上，非常不安全）" />
             <h2>登录</h2>
             <ui-text-field v-model="account"  hintText="账号" />
             <br>
@@ -27,19 +28,31 @@
                 account: '',
                 password: '',
                 test: '',
-                key: ''
+                key: '',
+                trustDevice: false
             }
         },
         computed: {
         },
         created () {},
         mounted () {
+            this.key = this.$storage.get('key', '')
+            this.account = this.$storage.get('account', '')
+            this.password = this.$storage.get('password', '')
+            this.trustDevice = this.$storage.get('trustDevice', false)
         },
         methods: {
             saveKey() {
                 this.$storage.set('key', this.key)
             },
             login() {
+                if (this.trustDevice) {
+                    this.$storage.set('account', this.account)
+                    this.$storage.set('password', this.password)
+                } else {
+                }
+                this.$storage.set('trustDevice', this.trustDevice)
+
                 this.$http.post(`/login`, {
                     account: this.account,
                     password: this.password

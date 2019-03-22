@@ -3,6 +3,21 @@ body {
     /* background-color: #f00; */
 }
 
+/* 网站 */
+.yunser-site-box {
+    position: fixed;
+    bottom: 8px;
+    left: 40px;
+    z-index: 10000000;
+    width: 24px;
+    height: 24px;
+    text-align: center;
+    line-height: 24px;
+    background-color: #fff;
+    border-radius: 50%;
+    border: 1px solid #000;
+    cursor: pointer;
+}
 /* 密码管理 */
 .yunser-password-box {
     position: fixed;
