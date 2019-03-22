@@ -16,8 +16,15 @@ let body = document.body;
 let state = 0;
 let x = 0;
 let y = 0;
+var search_engineer = 'baidu'
 let g_selectedText = ''
 
+/**
+ * @description 与background进行通讯兵监听返回结果,结果为popup中选中的搜索引擎索引
+ * @param text 需要查询的值
+ * @author 刘放 brizer1992@outlook.com 
+ * @date 2015/12/17 11:16
+ */
 function chooseEngineer(text) {
 	console.log('搜索', text)
 	chrome.extension.sendMessage({ resource: "content" }, function (response) {
@@ -27,120 +34,53 @@ function chooseEngineer(text) {
 }
 
 function createDiv(text, left, top) {
-    console.log('createDev')
-	var div = document.createElement('div')
-	let menus = [
-		{
-			id: 'a_copy',
-			label: '复制',
-			click() {
-				copyToBorad(text)
-			}
-		},
-		{
-			id: 'a_search',
-			label: '搜索',
-			click() {
-				chooseEngineer(text);
-			}
-		},
-		{
-			id: 'a_save',
-			label: '保存',
-			click() {
-				saveText(text)
-			}
-		},
-		{
-			id: 'a_share',
-			label: '分享',
-			click() {
-				// saveText(text)
-			}
-		},
-	]
-	let match = text.match(/(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/)
-	if (match) {
-		menus.push({
-			id: 'a_url',
-			label: '打开链接',
-			click() {
-				let match = text.match(/(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/)
-				window.open(match[0], '_blank')
-			}
-		},)
-	}
-	let items = []
-	for (let menu of menus) {
-		items.push(`<span class="yext-selection-item">
-			<a class="yext-selection-link" id="${menu.id}" href="javascript:;">${menu.label}</a>
-		</span>`)
-	}
-    div.innerHTML = `
-        <div class="yext-selection-list" id="selectionHelper">
-            ${items.join('\n')}
-        </div>
-    `
-    div.style.cssText = `
-    left: ${left}px;
-    top: ${top}px;
-    position: fixed;
-     z-index: 999;
-      background-color: rgb(255, 255, 255);
-
-    `
-	document.body.appendChild(div)
-	document.querySelector('#selectionHelper').addEventListener('mousedown', e => {
-        console.log('selection click')
-        e.stopPropagation()
-        // if (e.button === 1) {
-        // }
-    }, true)
-	for (let menu of menus) {
-		document.querySelector('#' + menu.id).addEventListener('click', e => {
-			menu.click && menu.click()
-			closeIcons()
-		}, true)
-	}
+	console.log('666-2')
+	var div = document.createElement("div");
+	div.id = "selectionHelper";
+	var span_copy = document.createElement("span");
+	var span_search = document.createElement("span");
+	var a_copy = document.createElement("a");
+	var a_search = document.createElement("a");
+	a_copy.innerHTML = "复制";
+	a_search.innerHTML = "搜索 |";
+	a_search.id = "a_search";
+	a_search.style.color = "gray";
+	let type = "baidu";
+	span_copy.appendChild(a_copy);
+	span_search.appendChild(a_search);
+	span_copy.style.margin = "3px";
+	span_search.style.margin = "3px";
+	div.appendChild(span_search);
+	div.appendChild(span_copy);
+	div.style.cssText = "left: " + left + "px; " + "top: " + top + "px; " + "position: fixed; font-size: 10px; line-height: 1.5; padding: 3px; border: 1px solid rgb(153, 153, 153); display: block; z-index: 999; background-color: rgb(255, 255, 255);";
+	body.appendChild(div);
+	div.addEventListener('mousedown', e => {
+		console.log('elem mousedown')
+		e.stopPropagation()
+	}, true)
+	a_search.onclick = function () {
+		console.log('搜索点击')
+		chooseEngineer(text);
+		closeIcons()
+	};
+	a_copy.onclick = function (e) {
+		copyToBorad(text);
+		closeIcons()
+	};
 }
 
 function copyToBorad(text) {
-	var textarea = document.createElement('textarea')
-	document.body.appendChild(textarea)
-	textarea.value = text
-	textarea.select()
-	document.execCommand('copy')
-	textarea.remove()
-    console.log('复制成功', text)
-    showToast('已复制')
-}
+	// document.execCommand("copy", false, null);
+	// window.prompt("请点击ctrl+C来复制", text);
 
-function showToast(text) {
-    let id = '' + new Date().getTime()
-    var div = document.createElement('div');
-    div.innerHTML = `
-        <div class="yext-toast" id="yext-toast-${id}">
-            ${text}
-        </div>
-    `
-    document.body.appendChild(div)
-    setTimeout(() => {
-        div.remove()
-    }, 1000)
+	var textarea = document.createElement('textarea');
+	document.body.appendChild(textarea);
+	textarea.value = g_selectedText;
+	textarea.select();
+	document.execCommand('copy');
+	textarea.remove();
+	console.log('复制成功', g_selectedText)
 }
-
-function saveText(text) {
-    // showToast(text)
-    chrome.runtime.sendMessage({
-        type: 'saveNote',
-        data: text
-    },
-    res => {
-        showToast('保存成功')
-    })
-}
-
-// showToast('这是什么')
 
 function openSearch(search_engineer, text) {
 	console.log('clik', openSearch)
@@ -157,22 +97,30 @@ function openSearch(search_engineer, text) {
 	};
 }
 
-body.addEventListener('mouseup', function (e) {
-    console.log('mouseup', state)
-    if (state == 1) {
-        return
-    }
-	var selected = window.getSelection()
-	var selectedText = selected.toString()
-	if (selectedText) {
-		var eve = e || window.event
-		x = eve.clientX
-		y = eve.clientY
-		x += document.body.scrollLeft
-		y += document.body.scrollTop
-		g_selectedText = selectedText
-		createDiv(selectedText, x, y)
+/**
+ * @description 鼠标抬起事件监听
+ * 1. 获取选中的文本字符串
+ * 2. 判断文本字符串长度和内容
+ * 3. 获取鼠标抬起位置，创建div
+ * 4. 将状态位state置为1，说明div已经出现
+ * @author 刘放 brizer1992@outlook.com
+ * @date 2015/12/15 
+ */
+body.addEventListener("mouseup", function (e) {
+	console.log('up4')
+	var selected = window.getSelection();
+	var selected_value = selected.toString();
+	if (selected_value !== '' && selected_value.length <= 30) {
+		var eve = e || window.event;
+		x = eve.clientX;
+		y = eve.clientY;
+		x += document.body.scrollLeft;
+		y += document.body.scrollTop;
+		g_selectedText = selected_value
+		createDiv(selected_value, x, y);
 		state = 1;
+	} else {
+		//
 	}
 }, false);
 
@@ -180,12 +128,20 @@ function closeIcons() {
 	var div = document.getElementById("selectionHelper");
 	if (div) {
 		// div.style.display = "none";
-        state = 0;
-        console.log('close')
+		// state = 0;
 		div.remove()
 	}
 }
-document.body.addEventListener("mousedown", function (e) {
+/**
+ * @description 鼠标点击事件监听
+ * 1. 鼠标点击后首先判断状态位，如果未出现则无反应
+ * 2. 如果div出现，则通过鼠标位置和div宽高决定div点击区域
+ * 3. 如果在点击区域内，则无反应，正常执行
+ * 4. 如果在区域外，则将div隐藏，状态位state置为0
+ * @author 刘放 brizer1992@outlook.com
+ * @date 2015/12/15
+ */
+body.addEventListener("mousedown", function (e) {
 	console.log('mousedown')
 	if (state == 1) {
 		var xx = e.clientX;
@@ -195,32 +151,20 @@ document.body.addEventListener("mousedown", function (e) {
 		if (xx <= x + 38 && yy <= y + 26) {
 
 		} else {
-			// var div = document.getElementById("selectionHelper"); // TODO
-			// if (!div) {
-			// 	return
-			// }
-			// div.style.display = "none";
-			// state = 0;
-			// div.remove()
-        }
-        
-        var div = document.getElementById("selectionHelper"); // TODO
-    if (!div) {
-        return
-    }
-    div.style.display = "none";
-    state = 0;
-    div.remove()
-            
-
+			var div = document.getElementById("selectionHelper"); // TODO
+			if (!div) {
+				return
+			}
+			div.style.display = "none";
+			state = 0;
+			div.remove()
+		}
 	}
 	closeIcons()
-}, false)
+}, false);
 
 
-document.body.addEventListener("contextmenu", function (e) {
-	console.log('菜单')
-}, false)
+
 
 
 // chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
@@ -339,13 +283,6 @@ chrome.runtime.onConnect.addListener(function (port) {
 			if (msg.type == 'openReadMode') {
 				openReadMode()
 			}
-			if (msg.type == 'setToClipboard') {
-				copyToBorad(msg.data)
-			}
-			if (msg.type == 'showToast') {
-				showToast(msg.data)
-			}
-
 		});
 	}
 });

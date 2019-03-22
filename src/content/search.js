@@ -116,6 +116,12 @@ let commonSearchs = [
 		searchKey: 'q'
 	},
 	{
+		name: '简书',
+		host: 'www.jianshu.com',
+		searchUrl: 'https://www.jianshu.com/search?q={keyword}',
+		searchKey: 'q'
+	},
+	{
 		name: '豆瓣',
 		host: 'www.douban.com',
 		searchUrl: 'https://www.douban.com/search?q={keyword}',

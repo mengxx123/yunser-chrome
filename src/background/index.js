@@ -22,17 +22,30 @@ let $root = document.createElement('textarea')
 $root.id = 'clipboard'
 document.body.appendChild($root)
 
+function copyToBorad(text) {
+	var textarea = document.createElement('textarea')
+	document.body.appendChild(textarea)
+	textarea.value = text
+	textarea.select()
+	document.execCommand('copy')
+	textarea.remove()
+    console.log('复制成功', text)
+    // showToast('已复制')
+}
+
 function copyToClipboard(str) {
-    let text = str
-    var copyFrom = document.createElement("textarea");
-    copyFrom.textContent = text;
-    copyFrom.value = text;
-    var body = document.getElementsByTagName('body')[0];
-    body.appendChild(copyFrom);
-    copyFrom.select();
-    let ret = document.execCommand('copy');
-    // body.removeChild(copyFrom);
-    console.log('copy ok', ret)
+    
+    // copyToBorad(str)
+    // let text = str
+    // var copyFrom = document.createElement("textarea");
+    // copyFrom.textContent = text;
+    // copyFrom.value = text;
+    // var body = document.getElementsByTagName('body')[0];
+    // body.appendChild(copyFrom);
+    // copyFrom.select();
+    // let ret = document.execCommand('copy');
+    // // body.removeChild(copyFrom);
+    // console.log('copy ok', ret)
 
     // var obj=document.getElementById("clipboard");
     // console.log('elem', obj)
@@ -42,6 +55,16 @@ function copyToClipboard(str) {
     //     let ret = document.execCommand("copy", false, null);
     //     console.log('copyed', ret, obj.value)
     // }
+
+    chrome.tabs.getSelected(null, tab => {
+        let port = chrome.tabs.connect(tab.id, {
+            name: 'test-connect'
+        })
+        port.postMessage({
+            type: 'setToClipboard',
+            data: str
+        })
+    })
 }
 
 // import storage from '../util/storage'
@@ -72,8 +95,16 @@ chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
         console.log('查找', ret)
         sendResponse(ret)
     }
-    if (request.type === 'getHeaders') {
-        sendResponse(requuestMap[request.url])
+
+    if (request.type === 'saveNote') {
+        let list = storage.get('notes', [])
+        list.unshift({
+            id: '' + new Date().getTime(),
+            content: request.data,
+            createTime: new Date()
+        })
+        storage.set('notes', list)
+        sendResponse({})
     }
 
     if (request.type === 'type_copy') {
@@ -138,31 +169,7 @@ function getItem(){
 	return item;
 }
 
-function initOmnibox() {
-    chrome.omnibox.onInputChanged.addListener(
-        function (text, suggest) {
-            console.log('inputChanged: ' + text);
-            suggest([
-                { content: text + " one", description: "the first one" },
-                { content: text + " number two", description: "the second entry" }
-            ]);
-        })
 
-    chrome.omnibox.onInputEntered.addListener(text => {
-        if (!text) {
-            return
-        }
-        let url = 'https://search.yunser.com/search?keyword=' + encodeURIComponent(text)
-        console.log('url', url)
-        chrome.tabs.getSelected(null, tab => {
-            chrome.tabs.update(tab.id, {
-                url
-            })
-        })
-    })
-}
-
-initOmnibox()
 
 // function getOpeningIds() {
 //     var ids = [];
@@ -240,11 +247,11 @@ chrome.runtime.onInstalled.addListener(function () {
         title: '复制图片地址（Markdown 格式）',
         contexts: ['image']
     })
-    chrome.contextMenus.create({
-        id: 'COPY_IMAGE_BASE64',
-        title: '复制图片（Base64 格式）',
-        contexts: ['image']
-    })
+    // chrome.contextMenus.create({
+    //     id: 'COPY_IMAGE_BASE64',
+    //     title: '复制图片（Base64 格式）',
+    //     contexts: ['image']
+    // })
 
     chrome.contextMenus.create({
         id: '003',
@@ -606,41 +613,9 @@ chrome.windows.onRemoved.addListener(windowId => {
     storage.set('accessToken', '')
 })
 
-console.log('asd2345', chrome.webRequest)
 
-// chrome.webRequest.onHeadersReceived.addListener(function (res, asd){
-//     console.log('webRequest请求', res, asd)
-// })
-
-// chrome.webRequest.onHeadersReceived.addListener(function(details) {
-//     details.responseHeaders.push({name:'Access-Control-Allow-Origin',value:"*"});
-//     console.log(details.responseHeaders)
-//       return {responseHeaders:details.responseHeaders};
-//       }
-// )
-
-let requuestMap = {
-
-}
-
-chrome.webRequest.onHeadersReceived.addListener(details => {
-    console.log(details)
-    requuestMap[details.url] = details
-}, {
-    urls: ["<all_urls>"],
-    "types": [
-        "main_frame", 
-        "sub_frame", 
-        "stylesheet", 
-        "script", 
-        "image", 
-        "object", 
-        "xmlhttprequest", 
-        "other"
-    ]
-},
-["responseHeaders"])
-
+require('./omni')
+require('./request')
 require('./drag')
 
 console.log('background end!')

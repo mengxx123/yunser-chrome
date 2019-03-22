@@ -33,52 +33,26 @@ function createDiv(text, left, top) {
 		{
 			id: 'a_copy',
 			label: '复制',
-			click() {
-				copyToBorad(text)
-			}
-		},
-		{
-			id: 'a_search',
-			label: '搜索',
-			click() {
-				chooseEngineer(text);
-			}
-		},
-		{
-			id: 'a_save',
-			label: '保存',
-			click() {
-				saveText(text)
-			}
-		},
-		{
-			id: 'a_share',
-			label: '分享',
-			click() {
-				// saveText(text)
-			}
-		},
+			click
+		}
 	]
-	let match = text.match(/(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/)
-	if (match) {
-		menus.push({
-			id: 'a_url',
-			label: '打开链接',
-			click() {
-				let match = text.match(/(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/)
-				window.open(match[0], '_blank')
-			}
-		},)
-	}
-	let items = []
-	for (let menu of menus) {
-		items.push(`<span class="yext-selection-item">
-			<a class="yext-selection-link" id="${menu.id}" href="javascript:;">${menu.label}</a>
-		</span>`)
-	}
     div.innerHTML = `
         <div class="yext-selection-list" id="selectionHelper">
-            ${items.join('\n')}
+            <span class="yext-selection-item">
+                <a class="yext-selection-link" id="a_copy" href="javascript:;">复制</a>
+            </span>
+            <span class="yext-selection-item">
+                <a class="yext-selection-link" id="a_search" href="javascript:;">搜索</a>
+			</span>
+			<span class="yext-selection-item">
+                <a class="yext-selection-link" id="a_url" href="javascript:;">打开链接</a>
+            </span>
+            <span class="yext-selection-item">
+                <a class="yext-selection-link" id="a_save" href="javascript:;">保存</a>
+            </span>
+            <span class="yext-selection-item">
+                <a class="yext-selection-link" id="a_share" href="javascript:;">分享</a>
+            </span>
         </div>
     `
     div.style.cssText = `
@@ -89,29 +63,43 @@ function createDiv(text, left, top) {
       background-color: rgb(255, 255, 255);
 
     `
-	document.body.appendChild(div)
-	document.querySelector('#selectionHelper').addEventListener('mousedown', e => {
+    document.body.appendChild(div)
+    document.querySelector('#selectionHelper').addEventListener('mousedown', e => {
         console.log('selection click')
         e.stopPropagation()
         // if (e.button === 1) {
         // }
     }, true)
-	for (let menu of menus) {
-		document.querySelector('#' + menu.id).addEventListener('click', e => {
-			menu.click && menu.click()
-			closeIcons()
-		}, true)
-	}
+    document.querySelector('#a_search').addEventListener('click', e => {
+        chooseEngineer(text);
+		closeIcons()
+    }, true)
+    document.querySelector('#a_copy').addEventListener('click', e => {
+        console.log('copy')
+        copyToBorad(text)
+		closeIcons()
+    }, true)
+    document.querySelector('#a_save').addEventListener('click', e => {
+        console.log('copy')
+        saveText(text)
+		closeIcons()
+	}, true)
+	document.querySelector('#a_url').addEventListener('click', e => {
+		let match = text.match(/(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/)
+		console.log('match', match)
+		window.open(match[0], '_blank')
+		closeIcons()
+    }, true)
 }
 
 function copyToBorad(text) {
-	var textarea = document.createElement('textarea')
-	document.body.appendChild(textarea)
-	textarea.value = text
-	textarea.select()
-	document.execCommand('copy')
-	textarea.remove()
-    console.log('复制成功', text)
+	var textarea = document.createElement('textarea');
+	document.body.appendChild(textarea);
+	textarea.value = g_selectedText;
+	textarea.select();
+	document.execCommand('copy');
+	textarea.remove();
+    console.log('复制成功', g_selectedText)
     showToast('已复制')
 }
 
@@ -218,9 +206,7 @@ document.body.addEventListener("mousedown", function (e) {
 }, false)
 
 
-document.body.addEventListener("contextmenu", function (e) {
-	console.log('菜单')
-}, false)
+
 
 
 // chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
@@ -339,13 +325,6 @@ chrome.runtime.onConnect.addListener(function (port) {
 			if (msg.type == 'openReadMode') {
 				openReadMode()
 			}
-			if (msg.type == 'setToClipboard') {
-				copyToBorad(msg.data)
-			}
-			if (msg.type == 'showToast') {
-				showToast(msg.data)
-			}
-
 		});
 	}
 });

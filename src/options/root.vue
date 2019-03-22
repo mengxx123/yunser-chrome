@@ -7,6 +7,15 @@
         暂无设置项
         </div>
         <!-- <img src="/static/img/icon.png" @click="test"> -->
+        <textarea v-model="input"></textarea>
+        <button @click="addNote">添加笔记</button>
+        <h2>笔记列表</h2>
+        <ul class="note-list">
+            <li class="item" v-for="item, index in notes">
+                {{ item.content }}
+                <div @click="remove(item, index)">删除</div>
+            </li>
+        </ul>
     </div>
 </template>
 
@@ -15,14 +24,48 @@
     export default {
         data() {
             return {
+                editType: 'create',
+                input: '',
+                notes: [],
             }
         },
         computed: {},
         created () {},
-        mounted () {},
+        mounted () {
+            this.loadData()
+        },
         methods: {
+            loadData() {
+                this.notes = this.$storage.get('notes', [])
+            },
             test() {
                 alert('test')
+            },
+            remove(item, index) {
+                this.notes.splice(index, 1)
+                this.$storage.set('notes', this.notes)
+            },
+            addNote() {
+                if (!this.input) {
+                    this.$message({
+                        type: 'danger',
+                        text: '请输入内容'
+                    })
+                    return
+                }
+                if (this.editType === 'create') {
+                    let list = this.$storage.get('notes', [])
+                    list.unshift({
+                        id: '' + new Date().getTime(),
+                        content: this.input,
+                        createTime: new Date()
+                    })
+                    this.$storage.set('notes', list)
+                    this.input = ''
+                    this.loadData()
+                } else {
+                    
+                }
             }
         }
     }

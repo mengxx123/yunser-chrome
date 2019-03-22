@@ -108,7 +108,8 @@ var drag_and_go = {
                 selection: this.drag_selection,
                 x_dir: x_dir,
                 y_dir: y_dir
-            }, res => {
+            },
+            res => {
             })
             // chrome.extension.connect().postMessage({
             //     type: 'drag_and_go',
