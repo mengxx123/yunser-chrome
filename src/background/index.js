@@ -22,17 +22,30 @@ let $root = document.createElement('textarea')
 $root.id = 'clipboard'
 document.body.appendChild($root)
 
+function copyToBorad(text) {
+	var textarea = document.createElement('textarea')
+	document.body.appendChild(textarea)
+	textarea.value = text
+	textarea.select()
+	document.execCommand('copy')
+	textarea.remove()
+    console.log('复制成功', text)
+    // showToast('已复制')
+}
+
 function copyToClipboard(str) {
-    let text = str
-    var copyFrom = document.createElement("textarea");
-    copyFrom.textContent = text;
-    copyFrom.value = text;
-    var body = document.getElementsByTagName('body')[0];
-    body.appendChild(copyFrom);
-    copyFrom.select();
-    let ret = document.execCommand('copy');
-    // body.removeChild(copyFrom);
-    console.log('copy ok', ret)
+    
+    // copyToBorad(str)
+    // let text = str
+    // var copyFrom = document.createElement("textarea");
+    // copyFrom.textContent = text;
+    // copyFrom.value = text;
+    // var body = document.getElementsByTagName('body')[0];
+    // body.appendChild(copyFrom);
+    // copyFrom.select();
+    // let ret = document.execCommand('copy');
+    // // body.removeChild(copyFrom);
+    // console.log('copy ok', ret)
 
     // var obj=document.getElementById("clipboard");
     // console.log('elem', obj)
@@ -42,6 +55,16 @@ function copyToClipboard(str) {
     //     let ret = document.execCommand("copy", false, null);
     //     console.log('copyed', ret, obj.value)
     // }
+
+    chrome.tabs.getSelected(null, tab => {
+        let port = chrome.tabs.connect(tab.id, {
+            name: 'test-connect'
+        })
+        port.postMessage({
+            type: 'setToClipboard',
+            data: str
+        })
+    })
 }
 
 // import storage from '../util/storage'
@@ -72,8 +95,23 @@ chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
         console.log('查找', ret)
         sendResponse(ret)
     }
-    if (request.type === 'getHeaders') {
-        sendResponse(requuestMap[request.url])
+
+    if (request.type === 'getClipboard') {
+        sendResponse({
+            type: 'getClipboardSuccess',
+            data: getClipboard()
+        })
+    }
+    
+    if (request.type === 'saveNote') {
+        let list = storage.get('notes', [])
+        list.unshift({
+            id: '' + new Date().getTime(),
+            content: request.data,
+            createTime: new Date()
+        })
+        storage.set('notes', list)
+        sendResponse({})
     }
 
     if (request.type === 'type_copy') {
@@ -123,6 +161,41 @@ chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
         console.log('查找', ret)
         // sendResponse(ret)
     }
+
+    if (request.type === 'type_getSite') {
+        let host = request.host
+        http.get(`/sites/${encodeURIComponent(host)}`).then(
+            response => {
+                let data = response.data
+                console.log('数据')
+                console.log(data)
+                // sendResponse(data)
+                chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+                    chrome.tabs.sendMessage(tabs[0].id, {
+                        type: 'type_getSiteSuccess',
+                        data
+                    })
+                })
+                
+            },
+            response => {
+                console.log('cuol')
+                if (response.code === 403) {
+                    console.log('403')
+                    // this.$store.state.user = null
+                }
+                this.loading = false
+            })
+        let userStyle = storage.get('userStyle')
+        let ret = []
+        for (let item of userStyle) {
+            if (item.url.includes(request.url)) {
+                ret.push(item)
+            }
+        }
+        console.log('查找', ret)
+        // sendResponse(ret)
+    }
 })
 
 function getItem(){
@@ -138,31 +211,7 @@ function getItem(){
 	return item;
 }
 
-function initOmnibox() {
-    chrome.omnibox.onInputChanged.addListener(
-        function (text, suggest) {
-            console.log('inputChanged: ' + text);
-            suggest([
-                { content: text + " one", description: "the first one" },
-                { content: text + " number two", description: "the second entry" }
-            ]);
-        })
 
-    chrome.omnibox.onInputEntered.addListener(text => {
-        if (!text) {
-            return
-        }
-        let url = 'https://search.yunser.com/search?keyword=' + encodeURIComponent(text)
-        console.log('url', url)
-        chrome.tabs.getSelected(null, tab => {
-            chrome.tabs.update(tab.id, {
-                url
-            })
-        })
-    })
-}
-
-initOmnibox()
 
 // function getOpeningIds() {
 //     var ids = [];
@@ -240,11 +289,11 @@ chrome.runtime.onInstalled.addListener(function () {
         title: '复制图片地址（Markdown 格式）',
         contexts: ['image']
     })
-    chrome.contextMenus.create({
-        id: 'COPY_IMAGE_BASE64',
-        title: '复制图片（Base64 格式）',
-        contexts: ['image']
-    })
+    // chrome.contextMenus.create({
+    //     id: 'COPY_IMAGE_BASE64',
+    //     title: '复制图片（Base64 格式）',
+    //     contexts: ['image']
+    // })
 
     chrome.contextMenus.create({
         id: '003',
@@ -428,10 +477,10 @@ chrome.runtime.onInstalled.addListener(function () {
         id: '033'
     })
 
-    chrome.contextMenus.create({
-        title: '网络工具',
-        id: 'network'
-    })
+    // chrome.contextMenus.create({
+    //     title: '网络工具',
+    //     id: 'network'
+    // })
 
     // chrome.contextMenus.create({
     //     title: '更多',
@@ -606,39 +655,48 @@ chrome.windows.onRemoved.addListener(windowId => {
     storage.set('accessToken', '')
 })
 
-console.log('asd2345', chrome.webRequest)
 
-// chrome.webRequest.onHeadersReceived.addListener(function (res, asd){
-//     console.log('webRequest请求', res, asd)
-// })
+require('./omni')
+require('./request')
+require('./drag')
 
-// chrome.webRequest.onHeadersReceived.addListener(function(details) {
-//     details.responseHeaders.push({name:'Access-Control-Allow-Origin',value:"*"});
-//     console.log(details.responseHeaders)
-//       return {responseHeaders:details.responseHeaders};
-//       }
-// )
 
-let requuestMap = {
+function getClipboard() {
+    var t = document.createElement("input");
+    document.body.appendChild(t);
+    t.focus();
+    document.execCommand("paste");
+    var clipboardText = t.value; //this is your clipboard data
+    // alert('asd' + clipboardText); //prepends "Hi" to the clipboard text
+    // console.log('asd' + clipboardText)
+    document.body.removeChild(t);
+    return clipboardText
 
+    // console.log('huoqu jianqieban')
+    // let bg = chrome.extension.getBackgroundPage();        // get the background page
+    // bg.document.body.innerHTML= "";                   // clear the background page
+
+    // // add a DIV, contentEditable=true, to accept the paste action
+    // var helperdiv = bg.document.createElement("div");
+    // document.body.appendChild(helperdiv);
+    // helperdiv.contentEditable = true;
+
+    // // focus the helper div's content
+    // var range = document.createRange();
+    // range.selectNode(helperdiv);
+    // window.getSelection().removeAllRanges();
+    // window.getSelection().addRange(range);
+    // helperdiv.focus();    
+
+    // // trigger the paste action
+    // bg.document.execCommand("Paste");
+
+    // // read the clipboard contents from the helperdiv
+    // var clipboardContents = helperdiv.innerHTML;
+    // alert(clipboardContents)
 }
 
-chrome.webRequest.onHeadersReceived.addListener(details => {
-    console.log(details)
-    requuestMap[details.url] = details
-}, {
-    urls: ["<all_urls>"],
-    "types": [
-        "main_frame", 
-        "sub_frame", 
-        "stylesheet", 
-        "script", 
-        "image", 
-        "object", 
-        "xmlhttprequest", 
-        "other"
-    ]
-},
-["responseHeaders"])
+
+
 
 console.log('background end!')

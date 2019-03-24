@@ -6,11 +6,12 @@
         </div>
         <div class="page-content">
             <div class="appbar">
+                <ui-icon-button class="btn" icon="add" @click="toggleStore" />
                 <ui-icon-button class="btn" icon="settings" @click="toggleSetting" />
                 <ui-icon-button class="btn" icon="help" @click="help" />
             </div>
             <!-- <a href="chrome://extensions/">拓展程序猿</a> -->
-            <div class="search-box">
+            <div class="search-box" v-if="searchVisible">
                 <div class="type">
                     <img class="img" :src="searchType.icon" @click.stop="toggleSearchType" ref="button">
                     <ui-menu class="type-menu" v-if="searchTypeVisible">
@@ -29,7 +30,7 @@
                 </ui-list>
             </div>
             <div class="container">
-                <ul class="app-list">
+                <ul class="app-list" v-if="shortCutVisible">
                     <li class="item" v-for="app, index in apps" @click="viewItem(app)" :key="index"
                         @contextmenu="handlerContextMenu($event, app, index)">
                         <img class="icon" :src="app.icon" v-if="app.icon">
@@ -58,6 +59,9 @@
                     <ui-list-item disableRipple @click.capture="handleToggle($event, 'searchVisible')" title="显示搜索框">
                         <ui-switch v-model="searchVisible" slot="right" />
                     </ui-list-item>
+                    <ui-list-item disableRipple @click.capture="handleToggle($event, 'shortCutVisible')" title="显示快捷图标">
+                        <ui-switch v-model="shortCutVisible" slot="right" />
+                    </ui-list-item>
                     <ui-list-item disableRipple @click.capture="handleToggle($event, 'sayingVisible')" title="一言">
                         <ui-switch v-model="sayingVisible" slot="right" />
                     </ui-list-item>
@@ -74,10 +78,20 @@
                     <ui-list-item disableRipple @click="more" title="更多设置">
                         <!-- <ui-switch v-model="todoVisible" slot="right" /> -->
                     </ui-list-item>
+
+                    <!-- <a href="#" class="login" @click.prevent="login" >登录</a> -->
+
+
+                    <ui-list-item disableRipple @click="login" title="登录" v-if="!isLogin">
+                        <!-- <ui-switch v-model="todoVisible" slot="right" /> -->
+                    </ui-list-item>
                     <ui-list-item disableRipple @click="toggleWallpaper" title="设置壁纸">
                         <!-- <ui-switch v-model="todoVisible" slot="right" /> -->
                     </ui-list-item>
                     <ui-list-item disableRipple href="https://extension.yunser.com/" target="_blank" title="官网">
+                        <!-- <ui-switch v-model="todoVisible" slot="right" /> -->
+                    </ui-list-item>
+                    <ui-list-item disableRipple href="https://project.yunser.com/products/ed7006403cc011e9ae11c3584647d0bc" target="_blank" title="帮助">
                         <!-- <ui-switch v-model="todoVisible" slot="right" /> -->
                     </ui-list-item>
                     <ui-list-item disableRipple @click="clearStorage" title="清除数据">
@@ -146,8 +160,8 @@
         </ui-drawer>
 
         <!-- <ui-float-button class="btn-add" icon="add" @click="add" /> -->
-        <ui-float-button class="btn-add" icon="add" @click="toggleStore" />
-        <a href="#" class="login" @click.prevent="login" v-if="!isLogin">登录</a>
+        <!-- <ui-float-button class="btn-add" icon="add" @click="toggleStore" /> -->
+        
         <ui-menu class="item-menu" :style="{top: menuTop + 'px', left: menuLeft + 'px'}" v-if="menuVisible">
             <ui-menu-item title="打开" @click="openItem"/>
             <ui-menu-item title="编辑" @click="editItem"/>
@@ -265,6 +279,7 @@
                 menuLeft: 10,
                 menuTop: 10,
                 searchVisible: true,
+                shortCutVisible: true,
                 clockVisible: false,
                 todoVisible: false,
                 sayingVisible: false,
@@ -337,6 +352,12 @@
                         icon: 'https://img1.yunser.com/icon/build.svg',
                         url: 'https://app.yunser.com/',
                         searchUrl: 'https://search.yunser.com/search?keyword={keyword}',
+                        key: 'Y'
+                    },
+                    {
+                        title: '好工具',
+                        icon: 'https://img1.yunser.com/nicetool/logo.png',
+                        url: 'http://www.nicetool.net/',
                         key: 'Y'
                     },
                     // {
@@ -507,6 +528,11 @@
                                 title: '虾米音乐',
                                 icon: 'https://img1.yunser.com/icon/xiami_music.png',
                                 url: 'https://www.xiami.com/'
+                            },
+                            {
+                                title: '网易云音乐',
+                                icon: 'https://img1.yunser.com/icon/netease_music.png',
+                                url: 'https://music.163.com/'
                             }
                         ]
                     },
@@ -608,6 +634,7 @@
             document.title = '新标签页'
             this.clockVisible = storage.get('clockVisible', false)
             this.todoVisible = storage.get('todoVisible', false)
+            this.shortCutVisible = storage.get('shortCutVisible', true)
             this.searchVisible = storage.get('searchVisible', true)
             this.sayingVisible = storage.get('sayingVisible', false)
             this.sayingText = storage.get('sayingText', false)
@@ -625,7 +652,7 @@
             setTimeout(() => {
                 console.log('focus')
                 document.getElementById('search-input').focus()
-            }, 1000)
+            }, 3000)
         },
         destroyed() {
             window.removeEventListener('keydown', this._keydown)
@@ -951,6 +978,9 @@
                     case 32:
                         document.getElementById('search-input').focus()
                         return false
+                    // case 86:
+                        // alert(1)
+                        // return
                 }
             },
             clearStorage() {
@@ -969,6 +999,9 @@
             },
             searchVisible(value) {
                 storage.set('searchVisible', value)
+            },
+            shortCutVisible(value) {
+                storage.set('shortCutVisible', value)
             },
             todoVisible(value) {
                 storage.set('todoVisible', value)
@@ -1101,6 +1134,7 @@
         padding: 80px;
         margin: 0 auto;
         flex-wrap: wrap;
+        user-select: none;
         .item {
             position: relative;
             cursor: pointer;

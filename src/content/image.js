@@ -158,6 +158,10 @@ chrome.runtime.sendMessage({
             title: 'JSON',
             actions
         })
+
+        // auto format
+        let $content = document.querySelector('pre')
+        $content.innerHTML = JSON.stringify(JSON.parse($content.innerHTML), null, 4)
     }
 
     if (contentType.includes('text/plain')) {

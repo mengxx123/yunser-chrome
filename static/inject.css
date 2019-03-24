@@ -5,6 +5,10 @@ body {
 
 /* 网站 */
 .yunser-site-box {
+    bottom: 8px;
+    left: 40px;
+}
+.fixed-circle-btn {
     position: fixed;
     bottom: 8px;
     left: 40px;
@@ -18,20 +22,15 @@ body {
     border: 1px solid #000;
     cursor: pointer;
 }
+.fixed-circle-btn.active {
+    color: #fff;
+    background-color: rgb(110, 179, 83);
+    border-color: rgb(110, 179, 83);
+}
 /* 密码管理 */
 .yunser-password-box {
-    position: fixed;
     bottom: 8px;
     left: 8px;
-    z-index: 10000000;
-    width: 24px;
-    height: 24px;
-    text-align: center;
-    line-height: 24px;
-    background-color: #fff;
-    border-radius: 50%;
-    border: 1px solid #000;
-    cursor: pointer;
 }
 .yunser-password-list {
     position: fixed;
@@ -111,4 +110,53 @@ body {
 .yext-appbar-actions {
     display: flex;
     align-items: center;
+}
+
+
+
+
+
+
+.yext-selection {
+    /* width: 100px; */
+}
+.yext-selection-list {
+    display: flex;
+    background-color: #fff;
+    border: 1px solid #999;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.yext-selection-item {
+    
+}
+.yext-selection-link {
+    display: block;
+    /* color: #f00; */
+    padding: 8px 16px;
+    /* border: 1px solid #f00; */
+    text-decoration: none;
+    color: #333;
+    border-right: 1px solid #000;
+}
+.yext-selection-link:hover {
+    background-color: #f1f1f1;
+}
+.yext-selection-link:last-child {
+    border-right: none;
+}
+
+.yext-toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(50%);
+    z-index: 1000000000000;
+    padding: 0px 16px;
+    background-color: #000;
+    border: 1px solid #fff;
+    color: #fff;
+    border-radius: 16px;
+    line-height: 32px;
+    box-sizing: border-box;
 }
