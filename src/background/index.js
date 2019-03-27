@@ -95,6 +95,12 @@ chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
         console.log('查找', ret)
         sendResponse(ret)
     }
+    if (request.type === 'type_closeWindow') {
+        console.log('bg')
+        chrome.tabs.getSelected(null, tab => {
+            chrome.tabs.remove(tab.id)
+        })
+    }
 
     if (request.type === 'getClipboard') {
         sendResponse({
@@ -195,6 +201,29 @@ chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
         }
         console.log('查找', ret)
         // sendResponse(ret)
+    }
+
+    if (request.type === 'type_getUrl') {
+        let { url } = request
+        http.get(`/urls/${encodeURIComponent(url)}`).then(
+            response => {
+                let data = response.data
+                console.log('url数据', data)
+                chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+                    chrome.tabs.sendMessage(tabs[0].id, {
+                        type: 'type_getUrlSuccess',
+                        data
+                    })
+                })
+            },
+            response => {
+                console.log('cuol')
+                if (response.code === 403) {
+                    console.log('403')
+                    // this.$store.state.user = null
+                }
+                this.loading = false
+            })
     }
 })
 
@@ -697,6 +726,22 @@ function getClipboard() {
 }
 
 
+chrome.tabs.onRemoved.addListener((tabId, info) => {
+    console.log('关闭', tabId, info)
+    // addClosedTab(tabId, 0)
+})
 
+// chrome.runtime.onInstalled.addListener(function(runInfo) {
+// 	if (runInfo.reason=="install") {
+// 		initialize();
+// 	}
+// 	if (runInfo.reason=="update") {
+// 		localStorage.dcTime = Date.now();
+
+// 		settingsUpdate();
+// 		// resetData(); 
+// 	}
+// 	setBadge();
+// });
 
 console.log('background end!')

@@ -220,6 +220,41 @@ document.body.addEventListener("mousedown", function (e) {
 
 document.body.addEventListener("contextmenu", function (e) {
 	console.log('菜单')
+	let $div = document.querySelector('#yext-context-menu')
+	if (!$div) {
+		$div = document.createElement('div')
+		$div.innerHTML = `
+			<div class="yext-context-menu" id="yext-context-menu">
+				<div id="yext-context-menu-btn1" class="yext-context-menu-btn">
+					关闭
+				</div>
+				<div id="yext-context-menu-btn2" class="yext-context-menu-btn">
+					撤销关闭
+				</div>
+			</div>
+			`
+		document.body.appendChild($div)
+		$div = document.querySelector('#yext-context-menu')
+
+		let hideElem
+		document.querySelector('#yext-context-menu-btn1').addEventListener('click', () => {
+			chrome.runtime.sendMessage({
+				type: 'type_closeWindow',
+			})
+			// window.close()
+		})
+		document.body.addEventListener('click', hideElem = () => {
+			$div.remove()
+			document.body.removeEventListener('click', hideElem)
+		})
+		
+	}
+	let top = e.clientY - 48 - 8
+	let left = e.clientX
+	// left += document.body.scrollLeft
+	// top += document.body.scrollTop
+	$div.style.top = top + 'px'
+	$div.style.left = left + 'px'
 }, false)
 
 

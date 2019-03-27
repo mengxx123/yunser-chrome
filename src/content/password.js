@@ -187,7 +187,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 			console.log('有数据', request.data)
 			document.querySelector('#yunser-site-box').classList.add('active')
 		}
-    }
+	}
+	if (request.type === 'type_getUrlSuccess') {
+		console.log('有数据0')
+		if (request.data) {
+			console.log('有数据2', request.data)
+			document.querySelector('#yunser-url-box').classList.add('active')
+		}
+  }
 })
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	
@@ -232,6 +239,22 @@ function dealSite() {
 	})
 }
 
+function dealUrl() {
+	let $root = document.createElement('div')
+	$root.innerHTML = `
+	<div id="yunser-url-box" class="fixed-circle-btn yunser-url-box" title="收藏">
+		U
+	</div>
+
+	`
+	let body = document.body
+	body.appendChild($root)
+
+	document.querySelector('#yunser-url-box').addEventListener('click', () => {
+		// window.open(`https://nav.yunser.com/sites/${location.host}`, '_blank')
+	})
+}
+
 
 function initInHtml() {
     console.log('初始化 HTML')
@@ -247,10 +270,21 @@ function initInHtml() {
     
 	dealPassword()
 	dealSite()
+	dealUrl()
 
 	chrome.runtime.sendMessage({
 		type: 'type_getSite',
 		host: location.host
+	}, res => {
+		// console.log('收到来自后台的回复：', res)
+		// for (let item of res) {
+		// 	setPageStyle(item.id, item.style)
+		// }
+	})
+
+	chrome.runtime.sendMessage({
+		type: 'type_getUrl',
+		url: location.href
 	}, res => {
 		// console.log('收到来自后台的回复：', res)
 		// for (let item of res) {
