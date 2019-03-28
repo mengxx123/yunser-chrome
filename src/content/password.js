@@ -205,8 +205,8 @@ function dealPassword() {
 	let $root = document.createElement('div')
 	$root.id = 'yunser-password-box'
 	$root.className = 'fixed-circle-btn yunser-password-box'
-	$root.innerHTML = `P
-
+	$root.innerHTML = `
+		<i class="material-icons icon">lock</i>
 	`
 	let body = document.body
 	body.appendChild($root)
@@ -255,6 +255,21 @@ function dealUrl() {
 	})
 }
 
+function dealNote() {
+	let $root = document.createElement('div')
+	$root.innerHTML = `
+	<div id="yunser-note-box" class="fixed-circle-btn yunser-note-box" title="比较">
+		N
+	</div>
+
+	`
+	let body = document.body
+	body.appendChild($root)
+
+	document.querySelector('#yunser-url-box').addEventListener('click', () => {
+		// window.open(`https://nav.yunser.com/sites/${location.host}`, '_blank')
+	})
+}
 
 function initInHtml() {
     console.log('初始化 HTML')
@@ -271,6 +286,7 @@ function initInHtml() {
 	dealPassword()
 	dealSite()
 	dealUrl()
+	dealNote()
 
 	chrome.runtime.sendMessage({
 		type: 'type_getSite',

@@ -114,6 +114,24 @@ chrome.runtime.sendMessage({
             title: `图片（ ${img.width} × ${img.height}）`,
             actions
         })
+
+        img.classList.add('ys-main-image')
+
+        let canvas = document.createElement('canvas')
+        canvas.className = 'ycanvas'
+        canvas.width = img.width
+        canvas.height = img.height
+        document.body.append(canvas)
+
+        var ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0)
+
+        console.log(canvas.toDataURL("image/png"))
+
+        img.addEventListener('click', e => {
+            // https://github.com/yunser/image-tool-front/blob/dev/src/views/Color.vue
+            
+        })
     }
     
     // if (contentType.includes('text/plain')) {

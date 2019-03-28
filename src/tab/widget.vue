@@ -98,8 +98,15 @@ export default {
     width: 256px;
     // height: 100px;
     // color: #fff;
+    // background-color: #f00;
+    &:hover {
+        .widget-list {
+            display: block;    
+        }
+    }
 }
 .widget-list {
+    display: none;
     height: 100%;
     padding: 16px;
     overflow: auto;

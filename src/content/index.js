@@ -173,6 +173,9 @@ body.addEventListener('mouseup', function (e) {
 		g_selectedText = selectedText
 		createDiv(selectedText, x, y)
 		state = 1;
+
+		// select to copy
+		copyToBorad(selectedText)
 	}
 }, false);
 
@@ -231,6 +234,9 @@ document.body.addEventListener("contextmenu", function (e) {
 				<div id="yext-context-menu-btn2" class="yext-context-menu-btn">
 					撤销关闭
 				</div>
+				<div id="yext-context-menu-btn3" class="yext-context-menu-btn">
+					新标签页
+				</div>
 			</div>
 			`
 		document.body.appendChild($div)
@@ -240,6 +246,12 @@ document.body.addEventListener("contextmenu", function (e) {
 		document.querySelector('#yext-context-menu-btn1').addEventListener('click', () => {
 			chrome.runtime.sendMessage({
 				type: 'type_closeWindow',
+			})
+			// window.close()
+		})
+		document.querySelector('#yext-context-menu-btn3').addEventListener('click', () => {
+			chrome.runtime.sendMessage({
+				type: 'type_newTab',
 			})
 			// window.close()
 		})
@@ -328,6 +340,15 @@ function setPageStyle(id, styleText) {
 
 	head.appendChild(styleElem);
 }
+
+function loadIcon() {
+	let styleElem = document.createElement('link')
+	styleElem.setAttribute('rel', 'stylesheet')
+	styleElem.setAttribute('href', 'https://fonts.googleapis.com/icon?family=Material+Icons')
+	var head = document.getElementsByTagName("head")[0];
+	head.appendChild(styleElem);
+}
+loadIcon()
 
 // setPageStyle('1', styleText)
 
