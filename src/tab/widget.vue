@@ -1,5 +1,5 @@
 <template>
-    <div class="widget" v-if="true">
+    <div :class="['widget', userSetting.isWidgetLock ? 'lock-fixed' : '']" v-if="true">
         <!-- <button @click="getClipboard">test</button> -->
         <ul class="widget-list">
             <li class="item" v-for="item in widgets" :key="item.id">
@@ -12,6 +12,10 @@
                 </div>
             </li>
         </ul>
+        <div class="lock" @click="toggleLock">
+            {{ userSetting.isWidgetLock ? '已锁定' : '锁定' }}
+            <!-- <ui-icon value="lock" /> -->
+        </div>
     </div>
 </template>
 
@@ -37,6 +41,7 @@ function copyToBorad(text) {
 export default {
     data() {
         return {
+            userSetting: {},
             widgets: [
             ],
         }
@@ -48,6 +53,9 @@ export default {
         }
     },
     mounted() {
+        this.userSetting = this.$storage.get('userSetting', {
+            isWidgetLock: true,
+        })
         this.widgets = this.$storage.get('widgets', [])
         this.widgets.forEach((item, index) => {
             this.$http.get(item.url).then(
@@ -65,6 +73,10 @@ export default {
         })
     },
     methods: {
+        toggleLock() {
+            this.userSetting.isWidgetLock = !this.userSetting.isWidgetLock
+            this.$storage.set('userSetting', this.userSetting)
+        },
         copy(text) {
             copyToBorad(text)
             this.$message({
@@ -99,8 +111,19 @@ export default {
     // height: 100px;
     // color: #fff;
     // background-color: #f00;
+    &.lock-fixed {
+        .widget-list {
+            display: block !important;
+        }
+        .lock {
+            display: block !important;
+        }
+    }
     &:hover {
         .widget-list {
+            display: block;    
+        }
+        .lock {
             display: block;    
         }
     }
@@ -132,5 +155,13 @@ export default {
     .text {
         cursor: pointer;
     }
+}
+.lock {
+    display: none;
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    color: #999;
+    cursor: pointer;
 }
 </style>

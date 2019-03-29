@@ -102,6 +102,15 @@ chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
         })
     }
 
+    if (request.type === 'type_getNoteByHost') {
+        console.log('type_getNoteByHost')
+        let list = storage.get('notes', [])
+        list = list.filter(item => {
+            return item.host === request.data.host
+        })
+        sendResponse(list)
+    }
+
     if (request.type === 'getClipboard') {
         sendResponse({
             type: 'getClipboardSuccess',
@@ -109,12 +118,13 @@ chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
         })
     }
     
-    if (request.type === 'saveNote') {
+    if (request.type === 'type_saveNote') {
         let list = storage.get('notes', [])
         list.unshift({
             id: '' + new Date().getTime(),
-            content: request.data,
-            createTime: new Date()
+            content: request.data.content,
+            createTime: new Date(),
+            host: request.data.host
         })
         storage.set('notes', list)
         sendResponse({})

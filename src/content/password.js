@@ -258,7 +258,7 @@ function dealUrl() {
 function dealNote() {
 	let $root = document.createElement('div')
 	$root.innerHTML = `
-	<div id="yunser-note-box" class="fixed-circle-btn yunser-note-box" title="比较">
+	<div id="yunser-note-box" class="fixed-circle-btn yunser-note-box" title="笔记">
 		N
 	</div>
 
@@ -266,8 +266,19 @@ function dealNote() {
 	let body = document.body
 	body.appendChild($root)
 
-	document.querySelector('#yunser-url-box').addEventListener('click', () => {
+	document.querySelector('#yunser-note-box').addEventListener('click', () => {
 		// window.open(`https://nav.yunser.com/sites/${location.host}`, '_blank')
+	})
+	chrome.runtime.sendMessage({
+		type: 'type_getNoteByHost',
+		data: {
+			host: location.host
+		}
+	}, res => {
+		console.log('啦啦啦：', res)
+		if (res.length) {
+			document.querySelector('#yunser-note-box').classList.add('active')
+		}
 	})
 }
 

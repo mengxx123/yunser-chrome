@@ -11,7 +11,7 @@
                 <ui-icon-button class="btn" icon="help" @click="help" />
             </div>
             <!-- <a href="chrome://extensions/">拓展程序猿</a> -->
-            <div class="search-box" v-if="searchVisible">
+            <div class="search-box" v-if="userSetting.searchVisible">
                 <div class="type">
                     <img class="img" :src="searchType.icon" @click.stop="toggleSearchType" ref="button">
                     <ui-menu class="type-menu" v-if="searchTypeVisible">
@@ -30,7 +30,7 @@
                 </ui-list>
             </div>
             <div class="container">
-                <ul class="app-list" v-if="shortCutVisible">
+                <ul class="app-list" v-if="userSetting.shortCutVisible">
                     <li class="item" v-for="app, index in apps" @click="viewItem(app)" :key="index"
                         @contextmenu="handlerContextMenu($event, app, index)">
                         <img class="icon" :src="app.icon" v-if="app.icon">
@@ -53,15 +53,6 @@
                     <ui-list-item disableRipple @click.capture="handleToggle($event, 'clockVisible')" title="显示时钟">
                         <ui-switch v-model="clockVisible" slot="right" />
                     </ui-list-item>
-                    <ui-list-item disableRipple @click.capture="handleToggle($event, 'todoVisible')" title="显示待办">
-                        <ui-switch v-model="todoVisible" slot="right" />
-                    </ui-list-item>
-                    <ui-list-item disableRipple @click.capture="handleToggle($event, 'searchVisible')" title="显示搜索框">
-                        <ui-switch v-model="searchVisible" slot="right" />
-                    </ui-list-item>
-                    <ui-list-item disableRipple @click.capture="handleToggle($event, 'shortCutVisible')" title="显示快捷图标">
-                        <ui-switch v-model="shortCutVisible" slot="right" />
-                    </ui-list-item>
                     <ui-list-item disableRipple @click.capture="handleToggle($event, 'sayingVisible')" title="一言">
                         <ui-switch v-model="sayingVisible" slot="right" />
                     </ui-list-item>
@@ -73,32 +64,24 @@
                 <ui-sub-header class="sub-title">其他</ui-sub-header>
                 <ui-list>
                     <ui-list-item disableRipple @click="bookmark" title="书签管理">
-                        <!-- <ui-switch v-model="todoVisible" slot="right" /> -->
                     </ui-list-item>
                     <ui-list-item disableRipple @click="more" title="更多设置">
-                        <!-- <ui-switch v-model="todoVisible" slot="right" /> -->
                     </ui-list-item>
 
                     <!-- <a href="#" class="login" @click.prevent="login" >登录</a> -->
 
 
                     <ui-list-item disableRipple @click="login" title="登录" v-if="!isLogin">
-                        <!-- <ui-switch v-model="todoVisible" slot="right" /> -->
                     </ui-list-item>
                     <ui-list-item disableRipple @click="toggleWallpaper" title="设置壁纸">
-                        <!-- <ui-switch v-model="todoVisible" slot="right" /> -->
                     </ui-list-item>
                     <ui-list-item disableRipple href="https://extension.yunser.com/" target="_blank" title="官网">
-                        <!-- <ui-switch v-model="todoVisible" slot="right" /> -->
                     </ui-list-item>
                     <ui-list-item disableRipple href="https://project.yunser.com/products/ed7006403cc011e9ae11c3584647d0bc" target="_blank" title="帮助">
-                        <!-- <ui-switch v-model="todoVisible" slot="right" /> -->
                     </ui-list-item>
                     <ui-list-item disableRipple @click="clearStorage" title="清除数据">
-                        <!-- <ui-switch v-model="todoVisible" slot="right" /> -->
                     </ui-list-item>
                     <ui-list-item disableRipple title="v1.0.5">
-                        <!-- <ui-switch v-model="todoVisible" slot="right" /> -->
                     </ui-list-item>
                 </ui-list>
             </div>
@@ -176,7 +159,7 @@
             <div class="item active"></div>
             <div class="item"></div>
         </div>
-        <todo v-if="todoVisible" />
+        <todo v-if="userSetting.todoVisible" />
         <saying v-if="sayingVisible" :text="sayingText" />
         <widget />
     </div>
@@ -188,6 +171,8 @@
     import todo from './todo.vue'
     import saying from './saying.vue'
     import widget from './widget.vue'
+    import defaultSetting from '../util/setting'
+    import entend from '../util/extend'
 
     function simpleUuid(len = 36, radix = 16) {
         var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
@@ -226,6 +211,7 @@
         },
         data() {
             return {
+                userSetting: defaultSetting,
                 // 搜索
                 searchType: {
                     name: '百度',
@@ -278,10 +264,7 @@
                 selectedGroupIndex: 0,
                 menuLeft: 10,
                 menuTop: 10,
-                searchVisible: true,
-                shortCutVisible: true,
                 clockVisible: false,
-                todoVisible: false,
                 sayingVisible: false,
                 sayingText: '测试文本',
                 apps: [
@@ -603,6 +586,7 @@
         computed: {},
         created () {},
         mounted () {
+            this.userSetting = entend(defaultSetting, this.$storage.get('userSetting', {}))
             let uuid = simpleUuid()
             console.log('uuid', uuid)
 
@@ -633,9 +617,6 @@
             //
             document.title = '新标签页'
             this.clockVisible = storage.get('clockVisible', false)
-            this.todoVisible = storage.get('todoVisible', false)
-            this.shortCutVisible = storage.get('shortCutVisible', true)
-            this.searchVisible = storage.get('searchVisible', true)
             this.sayingVisible = storage.get('sayingVisible', false)
             this.sayingText = storage.get('sayingText', false)
             this.apps = storage.get('apps', this.apps)
@@ -996,15 +977,6 @@
         watch: {
             clockVisible(value) {
                 storage.set('clockVisible', value)
-            },
-            searchVisible(value) {
-                storage.set('searchVisible', value)
-            },
-            shortCutVisible(value) {
-                storage.set('shortCutVisible', value)
-            },
-            todoVisible(value) {
-                storage.set('todoVisible', value)
             },
             sayingVisible(value) {
                 storage.set('sayingVisible', value)

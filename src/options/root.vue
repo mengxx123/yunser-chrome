@@ -5,6 +5,18 @@
             <!-- <ui-text-field v-model="imagePageBgColor" lable="图片背景色" /> -->
         </div>
         <div class="container">
+            <ui-sub-header class="sub-title">外观设置</ui-sub-header>
+            <ui-list>
+                <ui-list-item disableRipple title="显示搜索框">
+                    <ui-switch :value="userSetting.searchVisible" slot="right" @change="() => handleToggle('searchVisible')" />
+                </ui-list-item>
+                <ui-list-item disableRipple title="显示快捷图标">
+                    <ui-switch :value="userSetting.shortCutVisible" slot="right" @change="() => handleToggle('shortCutVisible')" />
+                </ui-list-item>
+                <ui-list-item disableRipple title="显示待办">
+                    <ui-switch :value="userSetting.todoVisible" slot="right" @change="() => handleToggle('todoVisible')" />
+                </ui-list-item>
+            </ui-list>
             <!-- <img src="/static/img/icon.png" @click="test"> -->
             <textarea v-model="input"></textarea>
             <button @click="addNote">添加笔记</button>
@@ -45,9 +57,13 @@
 
 <script>
     /* eslint-disable */
+    import entend from '../util/extend'
+    import defaultSetting from '../util/setting'
+
     export default {
         data() {
             return {
+                userSetting: defaultSetting,
                 editType: 'create',
                 input: '',
                 notes: [],
@@ -124,7 +140,19 @@
             this.loadData()
         },
         methods: {
+            handleToggle(key) {
+                // e.stopPropagation()
+                // e.preventDefault()
+                console.log('设置了', key)
+                this.userSetting[key] = !this.userSetting[key]
+                console.log('保存', this.userSetting)
+                this.$storage.set('userSetting', this.userSetting)
+            },
             loadData() {
+                console.log('123456')
+                this.userSetting = entend(defaultSetting, this.$storage.get('userSetting', {}))
+                console.log('读取的配置', this.userSetting)
+                
                 this.searchTypes = this.$storage.get('searchTypes', this.searchTypes)
                 this.myWidgets = this.$storage.get('widgets', [])
                 this.notes = this.$storage.get('notes', [])

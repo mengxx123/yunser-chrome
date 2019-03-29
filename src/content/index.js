@@ -132,8 +132,11 @@ function showToast(text) {
 function saveText(text) {
     // showToast(text)
     chrome.runtime.sendMessage({
-        type: 'saveNote',
-        data: text
+        type: 'type_saveNote',
+        data: {
+			content: text,
+			host: location.host
+		}
     },
     res => {
         showToast('保存成功')
@@ -175,7 +178,7 @@ body.addEventListener('mouseup', function (e) {
 		state = 1;
 
 		// select to copy
-		copyToBorad(selectedText)
+		// copyToBorad(selectedText)
 	}
 }, false);
 
