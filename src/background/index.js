@@ -117,7 +117,7 @@ chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
             data: getClipboard()
         })
     }
-    
+
     if (request.type === 'type_saveNote') {
         let list = storage.get('notes', [])
         list.unshift({
@@ -225,6 +225,60 @@ chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
                         data
                     })
                 })
+            },
+            response => {
+                console.log('cuol')
+                if (response.code === 403) {
+                    console.log('403')
+                    // this.$store.state.user = null
+                }
+                this.loading = false
+            })
+    }
+
+    if (request.type === 'type_saveUrl') {
+        http.post(`/urls`, {
+            title: request.data.title,
+            url: request.data.url,
+        }).then(
+            response => {
+                let data = response.data
+                // console.log('url数据', data)
+                // chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+                //     chrome.tabs.sendMessage(tabs[0].id, {
+                //         type: 'type_getUrlSuccess',
+                //     })
+                // })
+                chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+                    chrome.tabs.sendMessage(tabs[0].id, {
+                        type: 'type_saveUrlSuccess',
+                        data
+                    })
+                })
+                // sendResponse({
+                //     data: data
+                // })
+            },
+            response => {
+                console.log('cuol')
+                if (response.code === 403) {
+                    console.log('403')
+                    // this.$store.state.user = null
+                }
+                this.loading = false
+            })
+    }
+    if (request.type === 'type_removeUrl') {
+        http.delete(`/urls/${request.data.id}`).then(
+            response => {
+                let data = response.data
+                // console.log('url数据', data)
+                // chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+                //     chrome.tabs.sendMessage(tabs[0].id, {
+                //         type: 'type_getUrlSuccess',
+                //     })
+                // })
+                sendResponse()
             },
             response => {
                 console.log('cuol')
