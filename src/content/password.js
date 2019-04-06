@@ -192,9 +192,17 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 		console.log('有数据0')
 		if (request.data) {
 			console.log('有数据2', request.data)
+			window.urlCollection = true
+			window.urlData = request.data
 			document.querySelector('#yunser-url-box').classList.add('active')
 		}
-  }
+	}
+	if (request.type === 'type_saveUrlSuccess') {
+		console.log('收到来自后台的回复：', request)
+		window.urlCollection = true
+		window.urlData = request.data
+		document.querySelector('#yunser-url-box').classList.add('active')
+	}
 })
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	
@@ -251,7 +259,36 @@ function dealUrl() {
 	body.appendChild($root)
 
 	document.querySelector('#yunser-url-box').addEventListener('click', () => {
-		// window.open(`https://nav.yunser.com/sites/${location.host}`, '_blank')
+		if (window.urlCollection) {
+			console.log('删除', window.urlData)
+			chrome.runtime.sendMessage({
+				type: 'type_removeUrl',
+				data: {
+					id: window.urlData.id
+				}
+			}, res => {
+				window.urlCollection = false
+				window.urlData = null
+				document.querySelector('#yunser-url-box').classList.remove('active')
+			// console.log('收到来自后台的回复：', res)
+			// for (let item of res) {
+			// 	setPageStyle(item.id, item.style)
+			// }
+			})
+		} else {
+			chrome.runtime.sendMessage({
+				type: 'type_saveUrl',
+				data: {
+					url: location.href,
+					title: document.title
+				}
+			}, res => {
+				
+			// for (let item of res) {
+			// 	setPageStyle(item.id, item.style)
+			// }
+			})
+		}
 	})
 }
 
