@@ -212,12 +212,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 function dealPassword() {
 	let $root = document.createElement('div')
 	$root.id = 'yunser-password-box'
-	$root.className = 'fixed-circle-btn yunser-password-box'
+	$root.className = 'yunser-page-actions-btn'
 	$root.innerHTML = `
-		<i class="material-icons icon">lock</i>
+	密码
 	`
 	let body = document.body
-	body.appendChild($root)
+	document.getElementById('yunser-page-actions').appendChild($root)
 
 	$root.addEventListener('click', () => {
 		let $list = document.querySelector('#yunser-password-list')
@@ -231,16 +231,19 @@ function dealPassword() {
 	})
 }
 
+function createPageAction(acton) {
+	
+}
+
 function dealSite() {
 	let $root = document.createElement('div')
 	$root.innerHTML = `
-	<div id="yunser-site-box" class="fixed-circle-btn yunser-site-box" title="查看站点">
-		i
+	<div id="yunser-site-box" class="yunser-page-actions-btn" title="">
+	站点
 	</div>
 
 	`
-	let body = document.body
-	body.appendChild($root)
+	document.getElementById('yunser-page-actions').appendChild($root)
 
 	document.querySelector('#yunser-site-box').addEventListener('click', () => {
 		window.open(`https://nav.yunser.com/sites/${location.host}`, '_blank')
@@ -250,13 +253,12 @@ function dealSite() {
 function dealUrl() {
 	let $root = document.createElement('div')
 	$root.innerHTML = `
-	<div id="yunser-url-box" class="fixed-circle-btn yunser-url-box" title="收藏">
-		U
+	<div id="yunser-url-box" class="yunser-page-actions-btn" title="收藏">
+		收藏
 	</div>
 
 	`
-	let body = document.body
-	body.appendChild($root)
+	document.getElementById('yunser-page-actions').appendChild($root)
 
 	document.querySelector('#yunser-url-box').addEventListener('click', () => {
 		if (window.urlCollection) {
@@ -295,13 +297,12 @@ function dealUrl() {
 function dealNote() {
 	let $root = document.createElement('div')
 	$root.innerHTML = `
-	<div id="yunser-note-box" class="fixed-circle-btn yunser-note-box" title="笔记">
-		N
+	<div id="yunser-note-box" class="yunser-page-actions-btn">
+		笔记
 	</div>
 
 	`
-	let body = document.body
-	body.appendChild($root)
+	document.getElementById('yunser-page-actions').appendChild($root)
 
 	document.querySelector('#yunser-note-box').addEventListener('click', () => {
 		// window.open(`https://nav.yunser.com/sites/${location.host}`, '_blank')
@@ -358,12 +359,11 @@ function initInHtml() {
 }
 
 function init() {
-
-    // if (window)
-    console.log('哈哈哈', )
-
-    if (window._app.contentType.includes('text/html')) {
-        initInHtml()
+		if (window._app.contentType.includes('text/html')) { // TODO file
+			// if (location.hostname === 'localhost') {
+			// 	return
+			// }
+			initInHtml()
     }
 }
 

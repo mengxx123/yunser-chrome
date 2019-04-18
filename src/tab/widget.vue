@@ -2,6 +2,14 @@
     <div :class="['widget', userSetting.isWidgetLock ? 'lock-fixed' : '']" v-if="true">
         <!-- <button @click="getClipboard">test</button> -->
         <ul class="widget-list">
+            <li class="item">
+                <div class="header">
+                    <div class="title">图片编辑</div>
+                </div>
+                <div class="body">
+                    <input type="file" @change="onFileChange($event)">
+                </div>
+            </li>
             <li class="item" v-for="item in widgets" :key="item.id">
                 <div class="header">
                     <div class="title">{{ item.name }}</div>
@@ -95,6 +103,20 @@ export default {
                 // 	setPageStyle(item.id, item.style)
                 // }
             })
+        },
+        onFileChange(e) {
+            console.log(e.target.files)
+            let file = e.target.files[0]
+            if (!file) {
+                return
+            }
+            let reader = new FileReader()
+            reader.onload = () => {
+                console.log(reader.result)
+                this.$storage.set('editImage', reader.result)
+                window.open('image.html')
+            }
+            reader.readAsDataURL(file)
         }
     }
 }

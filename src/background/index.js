@@ -72,6 +72,7 @@ function copyToClipboard(str) {
 console.log('background !')
 
 
+
 //选中的搜索引擎
 var whichoneSearch = '0';
 
@@ -111,13 +112,6 @@ chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
         sendResponse(list)
     }
 
-    if (request.type === 'getClipboard') {
-        sendResponse({
-            type: 'getClipboardSuccess',
-            data: getClipboard()
-        })
-    }
-
     if (request.type === 'type_saveNote') {
         let list = storage.get('notes', [])
         list.unshift({
@@ -133,6 +127,62 @@ chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
     if (request.type === 'type_copy') {
         console.log('后台复制')
         copyToClipboard(request.data)
+    }
+
+    if (request.type === 'type_editText') {
+        storage.set('text', request.data)
+        chrome.tabs.create({
+            url: 'pages/text.html'
+        })
+    }
+
+    if (request.type === 'type_tabRight') {
+        chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+            chrome.tabs.move([tabs[0].id], {
+                index: tabs[0].index + 1
+            })
+        })
+    }
+
+    if (request.type === 'type_tabLeft') {
+        chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+            chrome.tabs.move([tabs[0].id], {
+                index: tabs[0].index - 1
+            })
+        })
+    }
+
+    if (request.type === 'type_showRight') {
+        console.log('type_showRight')
+        chrome.tabs.query({}, function (tabs) {
+            chrome.tabs.query({active: true, currentWindow: true}, function (tabs2) {
+                for (let i = 0; i < tabs.length; i++) {
+                    if (tabs[i].id === tabs2[0].id) {
+                        chrome.tabs.highlight({
+                            tabs: [
+                                tabs[i + 1].index
+                            ]
+                        })
+                    }
+                }
+            })
+        })
+    }
+    if (request.type === 'type_showLeft') {
+        console.log('type_showRight')
+        chrome.tabs.query({}, function (tabs) {
+            chrome.tabs.query({active: true, currentWindow: true}, function (tabs2) {
+                for (let i = 0; i < tabs.length; i++) {
+                    if (tabs[i].id === tabs2[0].id) {
+                        chrome.tabs.highlight({
+                            tabs: [
+                                tabs[i - 1].index
+                            ]
+                        })
+                    }
+                }
+            })
+        })
     }
 
     if (request.type === 'getPassword') {
@@ -752,47 +802,22 @@ chrome.windows.onRemoved.addListener(windowId => {
 require('./omni')
 require('./request')
 require('./drag')
+require('./tab')
+require('./clipboard')
 
 
-function getClipboard() {
-    var t = document.createElement("input");
-    document.body.appendChild(t);
-    t.focus();
-    document.execCommand("paste");
-    var clipboardText = t.value; //this is your clipboard data
-    // alert('asd' + clipboardText); //prepends "Hi" to the clipboard text
-    // console.log('asd' + clipboardText)
-    document.body.removeChild(t);
-    return clipboardText
-
-    // console.log('huoqu jianqieban')
-    // let bg = chrome.extension.getBackgroundPage();        // get the background page
-    // bg.document.body.innerHTML= "";                   // clear the background page
-
-    // // add a DIV, contentEditable=true, to accept the paste action
-    // var helperdiv = bg.document.createElement("div");
-    // document.body.appendChild(helperdiv);
-    // helperdiv.contentEditable = true;
-
-    // // focus the helper div's content
-    // var range = document.createRange();
-    // range.selectNode(helperdiv);
-    // window.getSelection().removeAllRanges();
-    // window.getSelection().addRange(range);
-    // helperdiv.focus();    
-
-    // // trigger the paste action
-    // bg.document.execCommand("Paste");
-
-    // // read the clipboard contents from the helperdiv
-    // var clipboardContents = helperdiv.innerHTML;
-    // alert(clipboardContents)
-}
-
-
-chrome.tabs.onRemoved.addListener((tabId, info) => {
-    console.log('关闭', tabId, info)
-    // addClosedTab(tabId, 0)
+chrome.runtime.onStartup.addListener(() => {
+    console.log('onStartup')
+    var settings = JSON.parse(localStorage.settings);
+    if (!settings.saveHistory) {
+        resetData(); 
+    }
+    else {
+        tabListProcessing();
+        cleanClosedTabs();
+        setBadge();
+    }
+    //console.log("START: "+Object.keys(settings).length);
 })
 
 // chrome.runtime.onInstalled.addListener(function(runInfo) {

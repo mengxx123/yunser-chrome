@@ -1,5 +1,5 @@
 /* eslint-disable */
-console.log('drag background')
+console.log('background - drag')
 
 function tabAction(tab, drag_data) {
     var new_idx = tab.index;

@@ -1,5 +1,5 @@
 /* eslint-disable */
-console.log('image', window._app)
+console.log('contant - image', window._app)
 
 
 function copyToClipboard(str) {
@@ -58,28 +58,16 @@ function createAppbar(appbar) {
     }
 }
 
-function initImage() {
-
-}
-
-chrome.runtime.sendMessage({
-	type: 'getHeaders',
-	url: location.href
-}, res => {
-    console.log('收到来自后台的回复：', res)
-    let contentType = ''
-	for (let item of res.responseHeaders) {
-        if (item.name.toLowerCase() === 'content-type') {
-            contentType = item.value
-        }
+function initImage(contentType = '') {
+    function isImage() {
+        return contentType.includes('image/') || location.href.match(/.png$/)
     }
-    console.log('contentType', contentType)
-    window._app.contentType = contentType
+
 
     if (contentType.includes('image/svg+xml')) {
         console.log('is svg')
-    } else if (contentType.includes('image/')) {
-        // console.log('is image')
+    } else if (isImage()) {
+        console.log('is image')
         let img = document.querySelector('img')
         // console.log(img.width, img.height)
         // let $root = document.createElement('div')
@@ -190,6 +178,36 @@ chrome.runtime.sendMessage({
             actions
         })
     }
+}
+
+chrome.runtime.sendMessage({
+	type: 'getHeaders',
+	url: location.href
+}, res => {
+    if (!res) {
+        return
+    }
+    console.log('收到来自后台的回复：', res)
+    let contentType = ''
+	for (let item of res.responseHeaders) {
+        if (item.name.toLowerCase() === 'content-type') {
+            contentType = item.value
+        }
+    }
+    console.log('contentType', contentType)
+    window._app.contentType = contentType
+
+    initImage(contentType)
 
     window._init()
 })
+
+if (location.href.match(/file:\/\//)) {
+    // initImage()
+}
+
+if (location.href.includes('http://localhost:8080/')) {
+    // initImage()
+    console.log('location.href', window.imok)
+    window.asd4 = '1212'
+}

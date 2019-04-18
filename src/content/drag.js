@@ -56,6 +56,7 @@ var drag_and_go = {
         this.start_y = e.clientY;
         this.drag_selection = this.getDragSelection(e);
         if (this.drag_selection.type == "text") {
+            console.log('是文本')
             var link = this.getTextLink(this.drag_selection.data);
             if (link != "") {
                 // Update the selection from text type to link

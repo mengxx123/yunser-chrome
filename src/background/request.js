@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-console.log('asd2345', chrome.webRequest)
+// console.log('asd2345', chrome.webRequest)
 
 // chrome.webRequest.onHeadersReceived.addListener(function (res, asd){
 //     console.log('webRequest请求', res, asd)
@@ -18,7 +18,7 @@ let requuestMap = {
 }
 
 chrome.webRequest.onHeadersReceived.addListener(details => {
-    console.log(details)
+    // console.log(details)
     requuestMap[details.url] = details
 }, {
     urls: ["<all_urls>"],

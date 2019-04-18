@@ -332,8 +332,8 @@ if (location.host === 'www.sogou.com') {
 function searchAsd(item, keyword) {
     keyword = decodeURIComponent(keyword)
 
-	let $root = document.createElement('div')
-	$root.className = 'yunser-search-box'
+	let $root = document.getElementById('yunser-search-box')
+	// $root.className = 'yunser-search-box'
 	let html = ''
 	let list = []
 	let sortedSearch = commonSearchs.sort((a, b) => {
@@ -360,32 +360,11 @@ function searchAsd(item, keyword) {
 	// styleElem.setAttribute('class', 'yunser-style')
 	// styleElem.setAttribute('type', 'text/css')
 	// styleElem.appendChild(document.createTextNode(styleText))
-	let body = document.getElementsByTagName('body')[0];
-	body.appendChild($root)
+	// let body = document.getElementsByTagName('body')[0];
+	// body.appendChild($root)
 
 	setPageStyle('ys-search-style', `
-	.yunser-search-box {
-		position: fixed;
-		top: 0;
-		right: 0;
-		width: 110px;
-		bottom: 0;
-		padding: 16px;
-		z-index: 1000000000;
-		background-color: #f9f9f9;
-		overflow-x: hidden;
-		overflow-x: auto;
-		border-left: 1px solid #ccc;
-		box-sizing: border-box;
-	}
-	.yunser-search-list {}
-	.yunser-search-item {
-		margin-bottom: 8px;
-	}
-	.yunser-search-link {
-		color: #666;
-		font-size: 14px;
-	}
+	
 	`)
 }
 
