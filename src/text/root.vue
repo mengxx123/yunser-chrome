@@ -3,6 +3,11 @@
         <ui-appbar title="文本编辑器">
         </ui-appbar>
         <div class="body">
+            <div class="plugins">
+                <div class="plugin">
+                    123
+                </div>
+            </div>
             <textarea class="textarea" v-model="text" name="" id="" cols="30" rows="10"></textarea>
         </div>
     </div>
@@ -30,10 +35,20 @@
 
 <style lang="scss">
     .body {
+        display: flex;
         height: 100%;
         padding: 16px;
     }
+    .plugins {
+        width: 400px;
+        border-right: 1px solid #000;
+        .plugin {
+            padding: 16px;
+            border: 1px solid #f00;
+        }
+    }
     .textarea {
+        flex-grow: 1;
         padding: 16px;
         width: 100%;
         height: 100%;

@@ -144,6 +144,11 @@ chrome.extension.onMessage.addListener(function(request,sender,sendResponse){
         })
     }
 
+    if (request.type === 'type_getStorage') {
+        console.log('storage.get(request.data)', request.data)
+        sendResponse(storage.get(request.data))
+    }
+
     if (request.type === 'type_tabLeft') {
         chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
             chrome.tabs.move([tabs[0].id], {
