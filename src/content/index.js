@@ -172,6 +172,8 @@ body.addEventListener('mouseup', function (e) {
     }
 	var selected = window.getSelection()
 	var selectedText = selected.toString()
+	selectedText = selectedText.replace(/^\s+/, '').replace(/\s+$/, '')
+	console.log('选择的文本：', selectedText)
 	if (selectedText) {
 		var eve = e || window.event
 		x = eve.clientX
