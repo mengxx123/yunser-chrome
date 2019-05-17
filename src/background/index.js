@@ -798,10 +798,11 @@ chrome.runtime.onInstalled.addListener(function () {
     // });
 })
 
-chrome.windows.onRemoved.addListener(windowId => {
-    storage.set('key', '')
-    storage.set('accessToken', '')
-})
+// chrome.windows.onRemoved.addListener(windowId => {
+//     chrome.windows.getAll((getInfo, windows) => {
+//         console.log('windows', windows)
+//     })
+// })
 
 
 require('./omni')

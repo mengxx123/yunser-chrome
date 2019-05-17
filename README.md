@@ -2,6 +2,8 @@
 
 > 好用的浏览器拓展。
 
+
+```
 $ node -v
 10.15.0
 $ npm -v
@@ -11,14 +13,21 @@ $ node -v
 v8.11.4
 $ npm -v
 6.4.0
+```
 
 
-
-yunserdeMacBook-Pro:yunser-chrome yunser$ node -v
+$ node -v
 v8.15.0
-yunserdeMacBook-Pro:yunser-chrome yunser$ npm -v
+$ npm -v
 6.4.1
 
+在以下环境运行不起来
+
+$node -v
+v10.15.3
+$npm -v
+6.4.1
+```
 
 ## 最新更新
 
