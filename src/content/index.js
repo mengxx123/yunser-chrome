@@ -3,14 +3,11 @@
 
 require('./header')
 
-window.devtoolsDetector = function () { }
-console.clear = function () { }
 // var content = chrome.extension.getURL('js/content.js')
 // var script = document.createElement('script')
 // script.setAttribute('type', 'text/javascript')
 // script.setAttribute('src', content)
 // document.body.appendChild(script)
-
 
 let body = document.body;
 let state = 0;
@@ -49,6 +46,17 @@ function createDiv(text, left, top) {
 			label: '保存',
 			click() {
 				saveText(text)
+			}
+		},
+		{
+			id: 'a_edit',
+			label: '编辑',
+			click() {
+				chrome.runtime.sendMessage({
+					type: 'type_editText',
+					data: text
+				}, res => {
+				})
 			}
 		},
 		{
@@ -130,7 +138,6 @@ function showToast(text) {
 }
 
 function saveText(text) {
-    // showToast(text)
     chrome.runtime.sendMessage({
         type: 'type_saveNote',
         data: {
@@ -142,8 +149,6 @@ function saveText(text) {
         showToast('保存成功')
     })
 }
-
-// showToast('这是什么')
 
 function openSearch(search_engineer, text) {
 	console.log('clik', openSearch)
@@ -167,6 +172,8 @@ body.addEventListener('mouseup', function (e) {
     }
 	var selected = window.getSelection()
 	var selectedText = selected.toString()
+	selectedText = selectedText.replace(/^\s+/, '').replace(/\s+$/, '')
+	console.log('选择的文本：', selectedText)
 	if (selectedText) {
 		var eve = e || window.event
 		x = eve.clientX
@@ -226,50 +233,117 @@ document.body.addEventListener("mousedown", function (e) {
 
 document.body.addEventListener("contextmenu", function (e) {
 	console.log('菜单')
-	let $div = document.querySelector('#yext-context-menu')
-	if (!$div) {
-		$div = document.createElement('div')
-		$div.innerHTML = `
-			<div class="yext-context-menu" id="yext-context-menu">
-				<div id="yext-context-menu-btn1" class="yext-context-menu-btn">
-					关闭
-				</div>
-				<div id="yext-context-menu-btn2" class="yext-context-menu-btn">
-					撤销关闭
-				</div>
-				<div id="yext-context-menu-btn3" class="yext-context-menu-btn">
-					新标签页
+	let $context = document.querySelector('#yext-context')
+	let $contextMenu = document.querySelector('#yext-context-menu')
+	let actions = [
+		{
+			id: '1',
+			label: '关闭',
+			click() {
+				chrome.runtime.sendMessage({
+					type: 'type_closeWindow',
+				})
+			}
+		},
+		{
+			id: '2',
+			label: '撤销关闭',
+			click() {
+				chrome.runtime.sendMessage({
+					type: 'type_openCloseTab',
+				})
+			}
+		},
+		{
+			id: '3',
+			label: '新标签页',
+			click() {
+				chrome.runtime.sendMessage({
+					type: 'type_newTab',
+				})
+			}
+		},
+		{
+			id: '4',
+			label: '历史记录',
+			click() {
+				chrome.runtime.sendMessage({
+					type: 'type_history',
+				})
+			}
+		},
+		{
+			id: '5',
+			label: '拓展程序',
+			click() {
+				chrome.runtime.sendMessage({
+					type: 'type_openUrl',
+					data: 'chrome://extensions/'
+				})
+			}
+		},
+		{
+			id: '6',
+			label: '稍后阅读',
+			click() {
+				chrome.runtime.sendMessage({
+					type: 'type_readLater',
+				})
+			}
+		},
+		// {
+		// 	id: '7',
+		// 	label: '编辑',
+		// 	click() {
+		// 		chrome.runtime.sendMessage({
+		// 			type: 'type_readLater',
+		// 		})
+		// 	}
+		// }
+	]
+	let actionHtml = []
+	for (let item of actions) {
+		actionHtml.push(
+			`<div id="yext-context-menu-action-${item.id}" class="yext-context-menu-btn">
+				${item.label}
+			</div>`)
+	}
+	actionHtml = actionHtml.join('\n')
+	
+
+	if (!$context) {
+		$context = document.createElement('div')
+		$context.innerHTML = `
+			<div id="yext-context">
+				<div class="yext-big-action"></div>
+				<div class="yext-context-menu" id="yext-context-menu">
+					${actionHtml}
 				</div>
 			</div>
 			`
-		document.body.appendChild($div)
-		$div = document.querySelector('#yext-context-menu')
+		document.body.appendChild($context)
+		$context = document.querySelector('#yext-context')
+		$contextMenu = document.querySelector('#yext-context-menu')
+
+		for (let item of actions) {
+			document.querySelector(`#yext-context-menu-action-${item.id}`).addEventListener('click', () => {
+				item.click && item.click()
+			})
+		}
 
 		let hideElem
-		document.querySelector('#yext-context-menu-btn1').addEventListener('click', () => {
-			chrome.runtime.sendMessage({
-				type: 'type_closeWindow',
-			})
-			// window.close()
-		})
-		document.querySelector('#yext-context-menu-btn3').addEventListener('click', () => {
-			chrome.runtime.sendMessage({
-				type: 'type_newTab',
-			})
-			// window.close()
-		})
 		document.body.addEventListener('click', hideElem = () => {
-			$div.remove()
+			$context.remove()
 			document.body.removeEventListener('click', hideElem)
 		})
 		
 	}
-	let top = e.clientY - 48 - 8
+	let top = e.clientY - 24 - 8
 	let left = e.clientX
 	// left += document.body.scrollLeft
 	// top += document.body.scrollTop
-	$div.style.top = top + 'px'
-	$div.style.left = left + 'px'
+	$contextMenu.style.top = top + 'px'
+	$contextMenu.style.left = left + 'px'
 }, false)
 
 
@@ -344,14 +418,14 @@ function setPageStyle(id, styleText) {
 	head.appendChild(styleElem);
 }
 
-function loadIcon() {
-	let styleElem = document.createElement('link')
-	styleElem.setAttribute('rel', 'stylesheet')
-	styleElem.setAttribute('href', 'https://fonts.googleapis.com/icon?family=Material+Icons')
-	var head = document.getElementsByTagName("head")[0];
-	head.appendChild(styleElem);
-}
-loadIcon()
+// function loadIcon() {
+// 	let styleElem = document.createElement('link')
+// 	styleElem.setAttribute('rel', 'stylesheet')
+// 	styleElem.setAttribute('href', 'https://fonts.googleapis.com/icon?family=Material+Icons')
+// 	var head = document.getElementsByTagName("head")[0];
+// 	head.appendChild(styleElem);
+// }
+// loadIcon()
 
 // setPageStyle('1', styleText)
 
@@ -413,6 +487,9 @@ chrome.runtime.sendMessage({
 	type: 'getStyle',
 	url: location.host
 }, res => {
+	if (!res) {
+		return
+	}
 	for (let item of res) {
 		setPageStyle(item.id, item.style)
 	}
@@ -666,20 +743,55 @@ function loadSimplePlugin(plugin) {
 	})
 }
 
+function dealPageAction() {
+	let $root = document.createElement('div')
+	$root.innerHTML = `
+		<div class="yunser-page-actions" id="yunser-page-actions">
 
+		</div>
+	`
+	let body = document.body
+	body.appendChild($root)
+}
 
+dealPageAction()
 
+function dealPlugins() {
+	let $root = document.createElement('div')
+	$root.innerHTML = `
+		<div>
+			<div class="yext-plugin-box-bar">
+				<div class="yext-plugin-box" id="yext-plugin-box">
+					<div class="yext-plugin-item">
+						<div class="yext-plugin-title">小工具</div>
+						<button id="yext-get-all-email">获取所有邮箱</button>
+					</div>
+					<div class="yext-plugin-item">
+						<div class="yext-plugin-title">搜索辅助</div>
+						<div id="yunser-search-box" class="yunser-search-box"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	`
+	let body = document.body
+	body.appendChild($root)
+	document.querySelector('#yext-get-all-email').addEventListener('click', () => {
+		let matchs = document.body.innerHTML.match(/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/g)
+		console.log('matchs', matchs)
+		if (!matchs.length) {
+			showToast('没有找到邮箱')
+			return
+		}
+		chrome.runtime.sendMessage({
+			type: 'type_editText',
+			data: matchs.join('\n')
+		}, res => {
+		})
+	})
+}
 
-
-
-
-
-
-
-
-console.log('inject finish2')
-
-
+dealPlugins()
 
 function initInHtml() {
     console.log('初始化 HTML')
@@ -697,11 +809,8 @@ function initInHtml() {
 	dealSite()
 }
 
-// function init() {
-
-
-
 require('./password')
 require('./search')
 require('./image')
 require('./drag')
+require('./key')

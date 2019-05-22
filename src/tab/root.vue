@@ -7,8 +7,9 @@
         <div class="page-content">
             <div class="appbar">
                 <ui-icon-button class="btn" icon="add" @click="toggleStore" />
+                <ui-icon-button class="btn" icon="settings" @click="more" />
                 <ui-icon-button class="btn" icon="settings" @click="toggleSetting" />
-                <ui-icon-button class="btn" icon="help" @click="help" />
+                <ui-icon-button class="btn" icon="person" @click="help" />
             </div>
             <!-- <a href="chrome://extensions/">拓展程序猿</a> -->
             <div class="search-box" v-if="userSetting.searchVisible">
@@ -67,21 +68,9 @@
                     </ui-list-item>
                     <ui-list-item disableRipple @click="more" title="更多设置">
                     </ui-list-item>
-
-                    <!-- <a href="#" class="login" @click.prevent="login" >登录</a> -->
-
-
                     <ui-list-item disableRipple @click="login" title="登录" v-if="!isLogin">
                     </ui-list-item>
                     <ui-list-item disableRipple @click="toggleWallpaper" title="设置壁纸">
-                    </ui-list-item>
-                    <ui-list-item disableRipple href="https://extension.yunser.com/" target="_blank" title="官网">
-                    </ui-list-item>
-                    <ui-list-item disableRipple href="https://project.yunser.com/products/ed7006403cc011e9ae11c3584647d0bc" target="_blank" title="帮助">
-                    </ui-list-item>
-                    <ui-list-item disableRipple @click="clearStorage" title="清除数据">
-                    </ui-list-item>
-                    <ui-list-item disableRipple title="v1.0.5">
                     </ui-list-item>
                 </ui-list>
             </div>
@@ -587,8 +576,12 @@
         created () {},
         mounted () {
             this.userSetting = entend(defaultSetting, this.$storage.get('userSetting', {}))
-            let uuid = simpleUuid()
-            console.log('uuid', uuid)
+            // UUID
+            let uuid = this.$storage.get('uuid')
+            if (!uuid) {
+                uuid = simpleUuid()
+                this.$storage.set('uuid', uuid)
+            }
 
             if (this.$storage.get('accessToken')) {
                 this.isLogin = true
@@ -629,11 +622,16 @@
             this.timer = setInterval(() => {
                 this.drawClock()
             }, 1000)
-            //
-            setTimeout(() => {
-                console.log('focus')
-                document.getElementById('search-input').focus()
-            }, 3000)
+
+            chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+                if (request.type === 'type_clipboardChange') {
+                    console.log('剪切板数据更新', request.data)
+                    // showPasswordList(request.data)
+                    // if (request.data.length) {
+                    //     document.querySelector('#yunser-password-box').classList.add('active')
+                    // }
+                }
+            })
         },
         destroyed() {
             window.removeEventListener('keydown', this._keydown)
@@ -956,18 +954,9 @@
                         }
                         this.keyword = this.suggestions[this.completeIndex]
                         return false
-                    case 32:
-                        document.getElementById('search-input').focus()
-                        return false
                     // case 86:
                         // alert(1)
                         // return
-                }
-            },
-            clearStorage() {
-                let ret = confirm('清除数据？')
-                if (ret) {
-                    localStorage.clear()
                 }
             },
             login() {

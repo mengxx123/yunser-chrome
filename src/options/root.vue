@@ -1,56 +1,70 @@
 <template>
-    <div class="page">
-        <ui-appbar title="设置"></ui-appbar>
+    <div class="page page-options">
+        <ui-appbar class="appbar" title="设置"></ui-appbar>
         <div class="body">
+            <div class="container">
+                <h2 class="sub-title">外观设置</h2>
+                <ui-list class="setting-list">
+                    <ui-list-item disableRipple title="显示搜索框">
+                        <ui-switch :value="userSetting.searchVisible" slot="right" @change="() => handleToggle('searchVisible')" />
+                    </ui-list-item>
+                    <ui-list-item disableRipple title="显示快捷图标">
+                        <ui-switch :value="userSetting.shortCutVisible" slot="right" @change="() => handleToggle('shortCutVisible')" />
+                    </ui-list-item>
+                    <ui-list-item disableRipple title="显示待办">
+                        <ui-switch :value="userSetting.todoVisible" slot="right" @change="() => handleToggle('todoVisible')" />
+                    </ui-list-item>
+                </ui-list>
+
+                <h2 class="sub-title">其他</h2>
+
+                <ui-list class="setting-list">
+                    <ui-list-item disableRipple href="https://extension.yunser.com/" target="_blank" title="官网">
+                    </ui-list-item>
+                    <ui-list-item disableRipple href="https://project.yunser.com/products/ed7006403cc011e9ae11c3584647d0bc" target="_blank" title="帮助">
+                    </ui-list-item>
+                    <ui-list-item disableRipple @click="clearStorage" title="清除数据">
+                    </ui-list-item>
+                    <ui-list-item disableRipple title="v1.0.5">
+                    </ui-list-item>
+                </ui-list>
+                
+                <!-- <img src="/static/img/icon.png" @click="test"> -->
+                <textarea v-model="input"></textarea>
+                <button @click="addNote">添加笔记</button>
+                <h2 class="section-title">笔记列表</h2>
+                <ul class="note-list">
+                    <li class="item" v-for="item, index in notes">
+                        {{ item.content }}
+                        <div @click="remove(item, index)">删除</div>
+                    </li>
+                </ul>
+                <h2 class="section-title">我的插件</h2>
+                <ul class="widget-list">
+                    <li class="item" v-for="item, index in myWidgets">
+                        {{ item.name }}
+
+                        <div @click="removeWidget(item, index)">删除</div>
+                    </li>
+                </ul>
+                <h2 class="section-title">插件市场</h2>
+                <ul class="widget-list">
+                    <li class="item" v-for="item, index in widgets">
+                        {{ item.name }}
+                        <div @click="addWidget(item, index)">添加</div>
+                        <!-- <div @click="remove(item, index)">删除</div> -->
+                    </li>
+                </ul>
+                <h2 class="section-title">我的搜索</h2>
+                <ul class="widget-list">
+                    <li class="item" v-for="item, index in searchTypes">
+                        {{ item.name }}
+
+                        <div @click="removeSearch(item, index)">删除</div>
+                    </li>
+                </ul>
+            </div>
             <!-- <ui-text-field v-model="imagePageBgColor" lable="图片背景色" /> -->
-        </div>
-        <div class="container">
-            <ui-sub-header class="sub-title">外观设置</ui-sub-header>
-            <ui-list>
-                <ui-list-item disableRipple title="显示搜索框">
-                    <ui-switch :value="userSetting.searchVisible" slot="right" @change="() => handleToggle('searchVisible')" />
-                </ui-list-item>
-                <ui-list-item disableRipple title="显示快捷图标">
-                    <ui-switch :value="userSetting.shortCutVisible" slot="right" @change="() => handleToggle('shortCutVisible')" />
-                </ui-list-item>
-                <ui-list-item disableRipple title="显示待办">
-                    <ui-switch :value="userSetting.todoVisible" slot="right" @change="() => handleToggle('todoVisible')" />
-                </ui-list-item>
-            </ui-list>
-            <!-- <img src="/static/img/icon.png" @click="test"> -->
-            <textarea v-model="input"></textarea>
-            <button @click="addNote">添加笔记</button>
-            <h2 class="section-title">笔记列表</h2>
-            <ul class="note-list">
-                <li class="item" v-for="item, index in notes">
-                    {{ item.content }}
-                    <div @click="remove(item, index)">删除</div>
-                </li>
-            </ul>
-            <h2 class="section-title">我的插件</h2>
-            <ul class="widget-list">
-                <li class="item" v-for="item, index in myWidgets">
-                    {{ item.name }}
-
-                    <div @click="removeWidget(item, index)">删除</div>
-                </li>
-            </ul>
-            <h2 class="section-title">插件市场</h2>
-            <ul class="widget-list">
-                <li class="item" v-for="item, index in widgets">
-                    {{ item.name }}
-                    <div @click="addWidget(item, index)">添加</div>
-                    <!-- <div @click="remove(item, index)">删除</div> -->
-                </li>
-            </ul>
-            <h2 class="section-title">我的搜索</h2>
-            <ul class="widget-list">
-                <li class="item" v-for="item, index in searchTypes">
-                    {{ item.name }}
-
-                    <div @click="removeSearch(item, index)">删除</div>
-                </li>
-            </ul>
         </div>
     </div>
 </template>
@@ -140,6 +154,12 @@
             this.loadData()
         },
         methods: {
+            clearStorage() {
+                let ret = confirm('清除数据？')
+                if (ret) {
+                    localStorage.clear()
+                }
+            },
             handleToggle(key) {
                 // e.stopPropagation()
                 // e.preventDefault()
@@ -205,6 +225,16 @@
 </script>
 
 <style lang="scss">
+    .page-options {
+        padding-top: 64px;
+        background-color: #f1f1f1;
+    }
+    .appbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+    }
     // * {
     //     margin: 0;
     //     padding: 0;
@@ -216,17 +246,20 @@
         max-width: 400px;
         margin: 0 auto;
     }
+    .sub-title {
+        font-size: 16px;
+        margin: 16px 0;
+    }
+    .setting-list {
+        background-color: #f9f9f9;
+        border: 1px solid #eee;
+        border-radius: 4px;
+    }
     .section-title {
         font-weight: bold;
         font-size: 24px;
     }
     .page {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-image: url("/static/img");
     }
     .app-list {
         display: flex;

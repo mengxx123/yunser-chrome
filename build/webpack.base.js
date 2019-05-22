@@ -16,6 +16,8 @@ module.exports = {
     tab: resolve('./tab'),
     options: resolve('./options'),
     help: resolve('./help'),
+    text: resolve('./text'),
+    image: resolve('./image'),
     bookmark: resolve('./bookmark'),
     content: resolve('./content'),
     background: resolve('./background'),
@@ -99,6 +101,8 @@ module.exports = {
     htmlPage('popup', 'popup', ['manifest', 'vendor', 'popup']),
     htmlPage('options', 'options', ['manifest', 'vendor', 'options']),
     htmlPage('help', 'help', ['manifest', 'vendor', 'help']),
+    htmlPage('image', 'image', ['manifest', 'vendor', 'image']),
+    htmlPage('text', 'text', ['manifest', 'vendor', 'text']),
     htmlPage('bookmark', 'bookmark', ['manifest', 'vendor', 'bookmark']),
     htmlPage('background', 'background', ['manifest', 'vendor', 'background']),
     // End customize
